@@ -11,33 +11,11 @@ namespace PhysEngine
     /// </summary>
     public abstract class Body
     {
-        public IMaterialPoint MaterialPoint { get; set; }
-
-        public float Torque;
-        public  float orient;
-        public float AngularVelocity { get; set; }
-
-        private TMaterial material;
-
-        private float staticFriction;
-        private float dynamicFriction;
-        public float GetStaticFriction => staticFriction;
-        public float GetDynamicFriction => dynamicFriction;
-
-        
-        /// <summary>
-        /// Угол ориентации в радианах
-        /// </summary>
-        public float Orient
-        {
-            get => orient;
-            set
-            {
-                orient = value;
-                shape.SetOrient(orient);
-            }
-        }
-        public TMaterial GetMaterial => material;     
+        public IMaterialPoint MaterialPoint { get; }
+        public IMaterial Material { get; }
+        public float Torque { get; set; }
+        public float Orient { get; set; }
+        public float AngularVelocity { get; set; }  
         /// <summary>
         /// Приложить к телу импульс, задаваемый двумя <see cref="Vector"/>
         /// </summary>
