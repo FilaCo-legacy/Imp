@@ -12,7 +12,7 @@ namespace PhysEngine
     /// </summary>
     public interface IShape:ICloneable
     {        
-        TBody Body { get; set; }
+        Body Body { get; set; }
         /// <summary>
         /// Тип фигуры
         /// </summary>
