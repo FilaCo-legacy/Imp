@@ -14,5 +14,7 @@ namespace PhysEngine
         IMaterialPoint MaterialPoint { get; }
 
         IMaterial Material { get; }
+
+        IShape Shape { get; }
     }
 }

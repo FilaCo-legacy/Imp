@@ -147,25 +147,5 @@ namespace PhysEngine
                 Y *= invLen;
             }
         }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is Vector))
-            {
-                return false;
-            }
-
-            var vector = (Vector)obj;
-            return X == vector.X &&
-                   Y == vector.Y;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 1861411795;
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            return hashCode;
-        }
     }
 }
