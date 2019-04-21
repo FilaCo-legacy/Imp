@@ -11,18 +11,22 @@ namespace PhysEngine
         /// Абсцисса вектора
         /// </summary>
         public float X { get; set; }
+
         /// <summary>
         /// Ордината вектора
         /// </summary>
         public float Y { get; set; }
+
         /// <summary>
         /// Длина вектора в квадрате
         /// </summary>
-        public float LengthSquared => DotProduct(this, this);
+        public float LengthSquared => X * X + Y * Y;
+
         /// <summary>
         /// Длина вектора
         /// </summary>
-        public float Length => (float)Math.Sqrt(LengthSquared);
+        public float Length => (float)Math.Sqrt(X * X + Y * Y);
+
         /// <summary>
         /// Инициализирует новый экземпляр структуры <see cref="Vector"/>
         /// </summary>
@@ -33,6 +37,7 @@ namespace PhysEngine
             X = x;
             Y = y;
         }
+
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="Vector"/> как копию данного вектора
         /// </summary>
@@ -42,48 +47,59 @@ namespace PhysEngine
             X = original.X;
             Y = original.Y;
         }
+
         #region Operators
-        public static Vector operator - (Vector vector)
+        public static Vector operator -(Vector vector)
         {
             return new Vector(-vector.X, -vector.Y);
         }
+
         public static Vector operator -(Vector a, Vector b)
         {
             return new Vector(a.X - b.X, a.Y - b.Y);
         }
+
         public static Vector operator -(Vector vector, float value)
         {
             return new Vector(vector.X - value, vector.Y - value);
         }
+
         public static Vector operator +(Vector a, Vector b)
         {
             return new Vector(a.X + b.X, a.Y + b.Y);
         }
-        public static Vector operator + (Vector vector, float value)
+
+        public static Vector operator +(Vector vector, float value)
         {
             return new Vector(vector.X + value, vector.Y + value);
         }
+
         public static Vector operator /(Vector vec, float divider)
         {
             return new Vector(vec.X / divider, vec.Y / divider);
         }
+
         public static Vector operator *(Vector vec, float multiplier)
         {
             return new Vector(vec.X * multiplier, vec.Y * multiplier);
         }
+
         public static Vector operator *(float multiplier, Vector vec)
         {
             return new Vector(vec.X * multiplier, vec.Y * multiplier);
-        }         
-        public static bool operator == (Vector a, Vector b)
+        }
+
+        public static bool operator ==(Vector a, Vector b)
         {
             return a.X == b.X && a.Y == b.Y;
         }
-        public static bool operator != (Vector a, Vector b)
+
+        public static bool operator !=(Vector a, Vector b)
         {
             return a.X != b.X || a.Y != b.Y;
         }
         #endregion
+
         /// <summary>
         /// Перенастроить экземпляр структуры <see cref="Vector"/> на заданные параметры
         /// </summary>
@@ -94,6 +110,7 @@ namespace PhysEngine
             X = x;
             Y = y;
         }
+
         /// <summary>
         /// Векторное произведение двух экземпляров структуры <see cref="Vector"/>
         /// </summary>
@@ -104,6 +121,7 @@ namespace PhysEngine
         {
             return a.X * b.Y - a.Y * b.X;
         }
+
         /// <summary>
         /// Векторное произведение экземпляра структуры <see cref="Vector"/> на скалярную величину
         /// </summary>
@@ -114,6 +132,7 @@ namespace PhysEngine
         {
             return new Vector(value * vec.Y, -value * vec.X);
         }
+
         /// <summary>
         /// Векторное произведение скалярной величины на экземпляр структуры <see cref="Vector"/>
         /// </summary>
@@ -124,6 +143,7 @@ namespace PhysEngine
         {
             return new Vector(-value * vec.Y, value * vec.X);
         }
+
         /// <summary>
         /// Скалярное произведение двух экземпляров структуры <see cref="Vector"/>
         /// </summary>
@@ -134,18 +154,40 @@ namespace PhysEngine
         {
             return a.X * b.X + a.Y * b.Y;
         }
+
         /// <summary>
         /// Нормализует вектор
         /// </summary>
         public void Normalize()
         {
-            float tmpLen = Length;
-            if (tmpLen > TScene.EPS)
+            var length = Length;
+
+            if (length < PhysEngineConsts.EPS)
+                return;
+
+            var invLen = 1.0f / Length;
+            X *= invLen;
+            Y *= invLen;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Vector))
             {
-                float invLen = 1.0f / tmpLen;
-                X *= invLen;
-                Y *= invLen;
+                return false;
             }
+
+            var vector = (Vector)obj;
+            return X == vector.X &&
+                   Y == vector.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1861411795;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            return hashCode;
         }
     }
 }

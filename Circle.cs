@@ -8,10 +8,6 @@ namespace PhysEngine
     public struct Circle: IShape
     {
         /// <summary>
-        /// Константа PI
-        /// </summary>
-        public const float PI = 3.14159f;
-        /// <summary>
         /// Радиус окружности
         /// </summary>
         public float Radius { get; set; }
@@ -37,7 +33,7 @@ namespace PhysEngine
         {
             if (Radius < 0)
                 throw new Exception("The radius has negative value");
-            return PI * Radius * Radius;
+            return (float)Math.PI * Radius * Radius;
         }
     }
 }
