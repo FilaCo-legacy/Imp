@@ -4,6 +4,7 @@ using System.Drawing;
 
 namespace PhysEngine
 {
+
     // Ускорение
     //    F = mA
     // => A = F * 1/m
@@ -20,19 +21,12 @@ namespace PhysEngine
     /// </summary>
     public class TScene
     {
-        /// <summary>
-        /// Общая точность вычислений для всех операций над объектами
-        /// </summary>
-        public const float EPS = 1e-4F;
-        public const float DEFAULT_DELTA_TIME = 1.0f / 60.0f;
-        public const float DEFAULT_GRAVITY_SCALE = 5.0f;
-        public static Vector2D DEFAULT_GRAVITY = new Vector2D(0, 9.8f * DEFAULT_GRAVITY_SCALE);
         private float dt;
         private uint iterations;
-        private Vector2D gravity;
+        private Vector gravity;
         private float gravityScale;
-        private List<TBody> bodies = new List<TBody>();
-        private List<TManifold> contacts = new List<TManifold>();
+        private List<Body> bodies = new List<Body>();
+        private List<Manifold> contacts = new List<Manifold>();
         /// <summary>
         /// Прирост времени модели сцены
         /// </summary>
@@ -40,7 +34,7 @@ namespace PhysEngine
         /// <summary>
         /// Вектор силы гравитации сцены
         /// </summary>
-        public Vector2D Gravity => gravity;
+        public Vector Gravity => gravity;
         public int ScaleVisual { get; set; }
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="TScene"/>
@@ -50,7 +44,7 @@ namespace PhysEngine
         /// <param name="valueGravity">Вектор гравитации, действующий на все тела в сцене</param>
         /// <param name="valueDt">Значение "прироста" времени</param>
         /// <param name="valueGrScale">Множитель гравитации</param>
-        public TScene(uint valueIterations, int valueScaleVisual, Vector2D valueGravity, float valueDt = DEFAULT_DELTA_TIME, 
+        public TScene(uint valueIterations, int valueScaleVisual, Vector valueGravity, float valueDt = DEFAULT_DELTA_TIME, 
             float valueGrScale = DEFAULT_GRAVITY_SCALE)
         {
             ScaleVisual = valueScaleVisual;
@@ -77,10 +71,10 @@ namespace PhysEngine
             iterations = valueIterations;
         }
         /// <summary>
-        /// Интегрирование силы, воздействующей на объект <see cref="TBody"/>
+        /// Интегрирование силы, воздействующей на объект <see cref="Body"/>
         /// </summary>
         /// <param name="valueBody">Целевой объект</param>
-        private void IntegrateForces(TBody valueBody)
+        private void IntegrateForces(Body valueBody)
         {
             if (valueBody.InverseMass == 0.0f)
                 return;
@@ -88,10 +82,10 @@ namespace PhysEngine
             valueBody.AngularVelocity += valueBody.Torque * valueBody.InverseInertia * (dt / 2.0f);
         }
         /// <summary>
-        /// Интегрирование скорости объекта <see cref="TBody"/>
+        /// Интегрирование скорости объекта <see cref="Body"/>
         /// </summary>
         /// <param name="valueBody">Целевой объект</param>
-        private void IntegrateVelocity(TBody valueBody)
+        private void IntegrateVelocity(Body valueBody)
         {
             if (valueBody.InverseMass == 0.0f)
                 return;
@@ -109,13 +103,13 @@ namespace PhysEngine
             contacts.Clear();
             for (int i = 0; i < bodies.Count; ++i)
             {
-                TBody objectA = bodies[i];
+                Body objectA = bodies[i];
                 for (int j = i + 1; j < bodies.Count; ++j)
                 {
-                    TBody objectB = bodies[j];
+                    Body objectB = bodies[j];
                     if (objectA.InverseMass == 0 && objectB.InverseMass == 0)
                         continue;
-                    TManifold curManifold = new TManifold(objectA, objectB, this);
+                    Manifold curManifold = new Manifold(objectA, objectB, this);
                     curManifold.Solve();
                     if (curManifold.ContactNumber > 0)
                         contacts.Add(curManifold);
@@ -142,7 +136,7 @@ namespace PhysEngine
             // Убираем все силы
             for (int i = 0; i < bodies.Count; ++i)
             {
-                TBody curBody = bodies[i];
+                Body curBody = bodies[i];
                 curBody.Force.Set(0, 0);
                 curBody.Torque = 0;
             }
@@ -164,11 +158,11 @@ namespace PhysEngine
         /// <param name="valueShape">Форма нового объекта</param>
         /// <param name="valueCenter">Позиция, на которую добавляется объект</param>
         /// <returns></returns>
-        public void Add(IShape valueShape, Vector2D valueCenter, TypeMaterial valueMaterial)
+        public void Add(IShape valueShape, Vector valueCenter, TypeMaterial valueMaterial)
         {
             if (valueShape == null)
                 throw new Exception("Форма была не назначена");
-            TBody curBody = new TBody(valueShape, valueCenter, valueMaterial);
+            Body curBody = new Body(valueShape, valueCenter, valueMaterial);
             bodies.Add(curBody);
             valueShape.Body = curBody;
         }
