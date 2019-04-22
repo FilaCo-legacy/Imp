@@ -26,7 +26,7 @@
 
         public Vector RightLower => _rightLower;
 
-        public Vector Center => new Vector(LeftUpper.X + Width / 2, LeftUpper.Y + Height / 2);
+        public Vector Center => 0.5f * (_leftUpper + _rightLower);
 
         public AABB(float x, float y, float width, float height)
         {

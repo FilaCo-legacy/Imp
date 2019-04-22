@@ -20,12 +20,12 @@ namespace PhysEngine
         /// <summary>
         /// Диспетчер, определяющий какую процедуру необходимо вызвать
         /// </summary>
-        private static CollisionSolver<Manifold, Body>[,] dispatcher =
+        private static CollisionSolver<Manifold, PhysObject>[,] dispatcher =
         {
             { CircleToCircle, CircleToPolygon },
             { PolygonToCircle, PolygonToPolygon }
         };
-        public static CollisionSolver<Manifold, Body>[,] Dispatcher => dispatcher;
+        public static CollisionSolver<Manifold, PhysObject>[,] Dispatcher => dispatcher;
         private static float FindAxisLeastPenetration(out int faceIndex, Polygon polyA, Polygon polyB)
         {
             float bestDistance = float.MinValue;
@@ -131,12 +131,12 @@ namespace PhysEngine
             return a > b * BIAS_RELATIVE + a * BIAS_ABSOLUTE || Math.Abs(a - b * BIAS_RELATIVE- a * BIAS_ABSOLUTE) <= TScene.EPS;
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формой <see cref="Circle"/>
+        /// Разрешение коллизии для двух физических тел <see cref="PhysObject"/> с формой <see cref="Circle"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void CircleToCircle(Manifold curManifold, Body objectA, Body objectB)
+        public static void CircleToCircle(Manifold curManifold, PhysObject objectA, PhysObject objectB)
         {
             // Получаем форму тел
             Circle circleA = objectA.GetShape as Circle;
@@ -169,12 +169,12 @@ namespace PhysEngine
             }
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формами <see cref="Circle"/> и <see cref="Polygon"/>
+        /// Разрешение коллизии для двух физических тел <see cref="PhysObject"/> с формами <see cref="Circle"/> и <see cref="Polygon"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void CircleToPolygon(Manifold curManifold, Body objectA, Body objectB)
+        public static void CircleToPolygon(Manifold curManifold, PhysObject objectA, PhysObject objectB)
         {
             Circle circleA = objectA.GetShape as Circle;
             Polygon polyB = objectB.GetShape as Polygon;
@@ -264,23 +264,23 @@ namespace PhysEngine
             }
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формами <see cref="Circle"/> и <see cref="Polygon"/>
+        /// Разрешение коллизии для двух физических тел <see cref="PhysObject"/> с формами <see cref="Circle"/> и <see cref="Polygon"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void PolygonToCircle(Manifold curManifold, Body objectA, Body objectB)
+        public static void PolygonToCircle(Manifold curManifold, PhysObject objectA, PhysObject objectB)
         {
             CircleToPolygon(curManifold, objectB, objectA);
             curManifold.VectorAB = -curManifold.VectorAB;
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формой <see cref="Polygon"/>
+        /// Разрешение коллизии для двух физических тел <see cref="PhysObject"/> с формой <see cref="Polygon"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void PolygonToPolygon(Manifold curManifold, Body objectA, Body objectB)
+        public static void PolygonToPolygon(Manifold curManifold, PhysObject objectA, PhysObject objectB)
         {
             Polygon polyA = objectA.GetShape as Polygon;
             Polygon polyB = objectB.GetShape as Polygon;
