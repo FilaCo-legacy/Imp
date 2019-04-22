@@ -1,4 +1,4 @@
-﻿namespace PhysEngine
+﻿namespace PhysEngine.Shapes
 {
     /// <summary>
     /// Интерфейс, описывающий форму объекта

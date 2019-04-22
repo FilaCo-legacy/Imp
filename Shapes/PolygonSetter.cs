@@ -4,22 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhysEngine
+namespace PhysEngine.Shapes
 {
-    public class DefaultVectorComparator : IComparer<Vector>
-    {
-        int IComparer<Vector>.Compare(Vector a, Vector b)
-        {
-            if (Math.Abs(a.X - b.X) < PhysEngineConsts.EPS)
-            {
-                if (Math.Abs(a.Y - b.Y) < PhysEngineConsts.EPS)
-                    return 0;
-                return a.Y.CompareTo(b.Y);
-            }
-            return a.X.CompareTo(b.X);
-        }
-    }
-
     /// <summary>
     /// Класс, представляющий собой метод преобразования массива точек в полигон с помощью построения МВО.
     /// Алгоритм Грэхэма-Эндрю: https://e-maxx.ru/algo/convex_hull_graham
@@ -29,10 +15,10 @@ namespace PhysEngine
         private Vector[] inputVertices;
         private Vector[] outputVertices;
         private Vector[] normals;
-        private List<Vector> downSet;
-        private List<Vector> upSet;
-        private Vector pointLeftDown;
-        private Vector pointRightUp;
+        private List<Vector> lowerSet;
+        private List<Vector> upperSet;
+        private Vector pointLeftUpper;
+        private Vector pointRightLower;
 
         /// <summary>
         /// Проверка на отрицательность ориентированной площади треугольника (по часовой стрелке)
@@ -62,15 +48,15 @@ namespace PhysEngine
         /// Обновление набора вершин выше разделяющей оси
         /// </summary>
         /// <param name="index">Текущая вершина для обновления</param>
-        private void UpdateUpSet(int index)
+        private void UpdateUpperSet(int index)
         {
-            if (index == inputVertices.Length - 1 || IsClockwiseAreaNegative(pointLeftDown, inputVertices[index], pointRightUp))
+            if (index == inputVertices.Length - 1 || IsClockwiseAreaNegative(pointLeftUpper, inputVertices[index], pointRightLower))
             {
-                while (upSet.Count >= 2 && !IsClockwiseAreaNegative(upSet[upSet.Count - 2], upSet.Last(), inputVertices[index]))
+                while (upperSet.Count >= 2 && !IsClockwiseAreaNegative(upperSet[upperSet.Count - 2], upperSet.Last(), inputVertices[index]))
                 {
-                    upSet.RemoveAt(upSet.Count - 1);
+                    upperSet.RemoveAt(upperSet.Count - 1);
                 }
-                upSet.Add(inputVertices[index]);
+                upperSet.Add(inputVertices[index]);
             }
         }
 
@@ -78,16 +64,16 @@ namespace PhysEngine
         /// Обновление набора вершин ниже разделяющей оси
         /// </summary>
         /// <param name="index"></param>
-        private void UpdateDownSet(int index)
+        private void UpdateLowerSet(int index)
         {
-            if (index == inputVertices.Length - 1 || IsCounterClockwiseAreaPositive(pointLeftDown, inputVertices[index], pointRightUp))
+            if (index == inputVertices.Length - 1 || IsCounterClockwiseAreaPositive(pointLeftUpper, inputVertices[index], pointRightLower))
             {
-                while (downSet.Count >= 2 && !IsCounterClockwiseAreaPositive(downSet[downSet.Count - 2], downSet.Last(),
+                while (lowerSet.Count >= 2 && !IsCounterClockwiseAreaPositive(lowerSet[lowerSet.Count - 2], lowerSet.Last(),
                     inputVertices[index]))
                 {
-                    downSet.RemoveAt(downSet.Count - 1);
+                    lowerSet.RemoveAt(lowerSet.Count - 1);
                 }
-                downSet.Add(inputVertices[index]);
+                lowerSet.Add(inputVertices[index]);
             }
         }
 
@@ -96,12 +82,12 @@ namespace PhysEngine
         /// </summary>
         private void ExtractVerticesFromSets()
         {
-            outputVertices = new Vector[upSet.Count + downSet.Count - 2];
+            outputVertices = new Vector[upperSet.Count + lowerSet.Count - 2];
             var iter = 0;
-            for (var j = upSet.Count - 1; j >= 0; --j, ++iter)
-                outputVertices[iter] = upSet[j];
-            for (var j = 1; j < downSet.Count - 1; ++j, ++iter)
-                outputVertices[iter] = downSet[j];
+            for (var j = upperSet.Count - 1; j >= 0; --j, ++iter)
+                outputVertices[iter] = upperSet[j];
+            for (var j = 1; j < lowerSet.Count - 1; ++j, ++iter)
+                outputVertices[iter] = lowerSet[j];
         }
 
         /// <summary>
@@ -111,16 +97,16 @@ namespace PhysEngine
         {
             Array.Sort(inputVertices, new DefaultVectorComparator());
 
-            pointLeftDown = inputVertices.First();
-            pointRightUp = inputVertices.Last();
+            pointLeftUpper = inputVertices.First();
+            pointRightLower = inputVertices.Last();
 
-            upSet.Add(pointLeftDown);
-            downSet.Add(pointLeftDown);
+            upperSet.Add(pointLeftUpper);
+            lowerSet.Add(pointLeftUpper);
 
             for (var index = 1; index < inputVertices.Length; ++index)
             {
-                UpdateUpSet(index);
-                UpdateDownSet(index);
+                UpdateUpperSet(index);
+                UpdateLowerSet(index);
             }
 
             ExtractVerticesFromSets();

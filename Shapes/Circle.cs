@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PhysEngine
+namespace PhysEngine.Shapes
 {
     /// <summary>
     /// Представляет собой окружность

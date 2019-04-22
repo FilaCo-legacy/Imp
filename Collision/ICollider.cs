@@ -1,4 +1,4 @@
-﻿namespace PhysEngine
+﻿namespace PhysEngine.Collision
 {
     /// <summary>
     /// Интерфейс, описывающий коллайдер для двух объектов, реализующих интерфейс <see cref="IBody"/>

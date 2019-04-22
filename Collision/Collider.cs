@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhysEngine
 {
-    public static class Collision
+    public static class Collider
     {
         /// <summary>
         /// Делегат задающий процедуру, разрешающую коллизию двух объектов
@@ -20,13 +20,13 @@ namespace PhysEngine
         /// <summary>
         /// Диспетчер, определяющий какую процедуру необходимо вызвать
         /// </summary>
-        private static CollisionSolver<TManifold, TBody>[,] dispatcher =
+        private static CollisionSolver<Manifold, Body>[,] dispatcher =
         {
             { CircleToCircle, CircleToPolygon },
             { PolygonToCircle, PolygonToPolygon }
         };
-        public static CollisionSolver<TManifold, TBody>[,] Dispatcher => dispatcher;
-        private static float FindAxisLeastPenetration(out int faceIndex, TPolygon polyA, TPolygon polyB)
+        public static CollisionSolver<Manifold, Body>[,] Dispatcher => dispatcher;
+        private static float FindAxisLeastPenetration(out int faceIndex, Polygon polyA, Polygon polyB)
         {
             float bestDistance = float.MinValue;
             int bestIndex = 0;
@@ -34,19 +34,19 @@ namespace PhysEngine
             for (int i = 0; i < polyA.VerticesCount; ++i)
             {
                 // Получаем нормаль полигона A
-                Vector2D curNormal = polyA.Normals[i];
-                Vector2D normalOriented = polyA.MatrOrient * curNormal;
+                Vector curNormal = polyA.Normals[i];
+                Vector normalOriented = polyA.MatrixOrient * curNormal;
 
                 // Переводим нормаль в систему отсчёта формы B
-                TMat22 buT = polyB.MatrOrient.Transpose();
+                TMat22 buT = polyB.MatrixOrient.Transpose();
                 curNormal = buT * normalOriented;
 
                 // Получаем опорную точку от B вдоль направления -curNormal
-                Vector2D curSupport = polyB.GetSupport(-curNormal);
+                Vector curSupport = polyB.GetSupport(-curNormal);
 
                 // Получаем вершину с формы А и переводим её в систему отсчёта формы B
-                Vector2D curVertexA = polyA.Vertices[i];
-                curVertexA = (polyA.MatrOrient * curVertexA) + polyA.Body.Position;
+                Vector curVertexA = polyA.Vertices[i];
+                curVertexA = (polyA.MatrixOrient * curVertexA) + polyA.Body.Position;
                 curVertexA -= polyB.Body.Position;
                 curVertexA = buT * curVertexA;
 
@@ -62,13 +62,13 @@ namespace PhysEngine
             faceIndex = bestIndex;
             return bestDistance;
         }
-        private static void FindIncidentFace(Vector2D[] vertices, TPolygon refPoly, TPolygon incPoly, int referenceIndex)
+        private static void FindIncidentFace(Vector[] vertices, Polygon refPoly, Polygon incPoly, int referenceIndex)
         {
-            Vector2D referenceNormal = refPoly.Normals[referenceIndex];
+            Vector referenceNormal = refPoly.Normals[referenceIndex];
 
             // Рассчитаем нормаль в системе отсчета полигона "инцидента"
-            referenceNormal = refPoly.MatrOrient * referenceNormal; // По отношению к системе отсчёта сцены
-            referenceNormal = incPoly.MatrOrient.Transpose() * referenceNormal; // по отношению к системе отсчёта полигона "инцидента"
+            referenceNormal = refPoly.MatrixOrient * referenceNormal; // По отношению к системе отсчёта сцены
+            referenceNormal = incPoly.MatrixOrient.Transpose() * referenceNormal; // по отношению к системе отсчёта полигона "инцидента"
 
             // Ищем наиболее "ненормальный" вектор на полигоне "инциденте"
             int incidentFace = 0;
@@ -84,16 +84,16 @@ namespace PhysEngine
             }
 
             // Назначаем ближайшие вершины к полигоне "инциденте"
-            vertices[0] = incPoly.MatrOrient * incPoly.Vertices[incidentFace] + incPoly.Body.Position;
+            vertices[0] = incPoly.MatrixOrient * incPoly.Vertices[incidentFace] + incPoly.Body.Position;
             incidentFace = incidentFace + 1;
             if (incidentFace == incPoly.VerticesCount)
                 incidentFace = 0;
-            vertices[1] = incPoly.MatrOrient * incPoly.Vertices[incidentFace] + incPoly.Body.Position;
+            vertices[1] = incPoly.MatrixOrient * incPoly.Vertices[incidentFace] + incPoly.Body.Position;
         }
-        private static int Clip(Vector2D normal, float c, Vector2D[] face)
+        private static int Clip(Vector normal, float c, Vector[] face)
         {
             int sp = 0;
-            Vector2D[] outFace = { face[0], face[1] };
+            Vector[] outFace = { face[0], face[1] };
 
             // Получаем расстояния от каждой конечно точки до прямой
             // d = ax + by - c
@@ -131,18 +131,18 @@ namespace PhysEngine
             return a > b * BIAS_RELATIVE + a * BIAS_ABSOLUTE || Math.Abs(a - b * BIAS_RELATIVE- a * BIAS_ABSOLUTE) <= TScene.EPS;
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="TBody"/> с формой <see cref="TCircle"/>
+        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формой <see cref="Circle"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void CircleToCircle(TManifold curManifold, TBody objectA, TBody objectB)
+        public static void CircleToCircle(Manifold curManifold, Body objectA, Body objectB)
         {
             // Получаем форму тел
-            TCircle circleA = objectA.GetShape as TCircle;
-            TCircle circleB = objectB.GetShape as TCircle;
+            Circle circleA = objectA.GetShape as Circle;
+            Circle circleB = objectB.GetShape as Circle;
             // Вектор из A в B
-            Vector2D vectorAB = objectB.Position - objectA.Position;
+            Vector vectorAB = objectB.Position - objectA.Position;
 
             float distanceSqr = vectorAB.LengthSquared;
             float sumRadius = circleA.Radius + circleB.Radius;
@@ -158,7 +158,7 @@ namespace PhysEngine
             if (distance <= TScene.EPS)
             {
                 curManifold.Penetration = circleA.Radius;
-                curManifold.VectorAB = new Vector2D(1, 0);
+                curManifold.VectorAB = new Vector(1, 0);
                 curManifold.Contacts[0] = objectA.Position;                
             }            
             else
@@ -169,19 +169,19 @@ namespace PhysEngine
             }
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="TBody"/> с формами <see cref="TCircle"/> и <see cref="TPolygon"/>
+        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формами <see cref="Circle"/> и <see cref="Polygon"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void CircleToPolygon(TManifold curManifold, TBody objectA, TBody objectB)
+        public static void CircleToPolygon(Manifold curManifold, Body objectA, Body objectB)
         {
-            TCircle circleA = objectA.GetShape as TCircle;
-            TPolygon polyB = objectB.GetShape as TPolygon;
+            Circle circleA = objectA.GetShape as Circle;
+            Polygon polyB = objectB.GetShape as Polygon;
 
             // Перевод центра круга в систему отсчёта полигона
-            Vector2D center = objectA.Position;
-            center = polyB.MatrOrient.Transpose() * (center - objectB.Position);
+            Vector center = objectA.Position;
+            center = polyB.MatrixOrient.Transpose() * (center - objectB.Position);
 
             // Найдём ребро с минимальным проникновением в окружность
             float separation = float.MinValue;
@@ -201,17 +201,17 @@ namespace PhysEngine
             }
 
             // Получаем вершины ребра, которое мы выбрали
-            Vector2D v1 = polyB.Vertices[faceNormal];
+            Vector v1 = polyB.Vertices[faceNormal];
             int sndVertex = faceNormal + 1;
             if (sndVertex >= polyB.VerticesCount)
                 sndVertex = 0;
-            Vector2D v2 = polyB.Vertices[sndVertex];
+            Vector v2 = polyB.Vertices[sndVertex];
 
             // Если центр внутри полигона
             if (Math.Abs(separation) <= TScene.EPS)
             {
                 curManifold.ContactNumber = 1;
-                curManifold.VectorAB = -(polyB.MatrOrient * polyB.Normals[faceNormal]);
+                curManifold.VectorAB = -(polyB.MatrixOrient * polyB.Normals[faceNormal]);
                 curManifold.Contacts[0] = curManifold.VectorAB * circleA.Radius + objectA.Position;
                 curManifold.Penetration = circleA.Radius;
                 return;
@@ -228,11 +228,11 @@ namespace PhysEngine
                 if ((center - v1).LengthSquared > circleA.Radius * circleA.Radius)
                     return;
                 curManifold.ContactNumber = 1;
-                Vector2D vAB = v1 - center;
-                vAB = polyB.MatrOrient * vAB;
+                Vector vAB = v1 - center;
+                vAB = polyB.MatrixOrient * vAB;
                 vAB.Normalize();
                 curManifold.VectorAB = vAB;
-                v1 = polyB.MatrOrient * v1 + objectB.Position;
+                v1 = polyB.MatrixOrient * v1 + objectB.Position;
                 curManifold.Contacts[0] = v1;
             }
 
@@ -242,10 +242,10 @@ namespace PhysEngine
                 if ((center - v2).LengthSquared > circleA.Radius * circleA.Radius)
                     return;
                 curManifold.ContactNumber = 1;
-                Vector2D vAB = v2 - center;
-                v2 = polyB.MatrOrient * v2 + objectB.Position;
+                Vector vAB = v2 - center;
+                v2 = polyB.MatrixOrient * v2 + objectB.Position;
                 curManifold.Contacts[0] = v2;
-                vAB = polyB.MatrOrient * vAB;
+                vAB = polyB.MatrixOrient * vAB;
                 vAB.Normalize();
                 curManifold.VectorAB = vAB;                
             }
@@ -253,37 +253,37 @@ namespace PhysEngine
             // Ближе к центральной области
             else
             {
-                Vector2D vAB = polyB.Normals[faceNormal];
+                Vector vAB = polyB.Normals[faceNormal];
                 if ((center - v1) * vAB > circleA.Radius)
                     return;
 
-                vAB = polyB.MatrOrient * vAB;
+                vAB = polyB.MatrixOrient * vAB;
                 curManifold.VectorAB = -vAB;
                 curManifold.Contacts[0] = curManifold.VectorAB * circleA.Radius + objectA.Position;
                 curManifold.ContactNumber = 1;
             }
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="TBody"/> с формами <see cref="TCircle"/> и <see cref="TPolygon"/>
+        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формами <see cref="Circle"/> и <see cref="Polygon"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void PolygonToCircle(TManifold curManifold, TBody objectA, TBody objectB)
+        public static void PolygonToCircle(Manifold curManifold, Body objectA, Body objectB)
         {
             CircleToPolygon(curManifold, objectB, objectA);
             curManifold.VectorAB = -curManifold.VectorAB;
         }
         /// <summary>
-        /// Разрешение коллизии для двух физических тел <see cref="TBody"/> с формой <see cref="TPolygon"/>
+        /// Разрешение коллизии для двух физических тел <see cref="Body"/> с формой <see cref="Polygon"/>
         /// </summary>
         /// <param name="curManifold">Многообразие двух объектов</param>
         /// <param name="objectA">Первый объект, входящий в многообразие</param>
         /// <param name="objectB">Второй объект, входящий в многообразие</param>
-        public static void PolygonToPolygon(TManifold curManifold, TBody objectA, TBody objectB)
+        public static void PolygonToPolygon(Manifold curManifold, Body objectA, Body objectB)
         {
-            TPolygon polyA = objectA.GetShape as TPolygon;
-            TPolygon polyB = objectB.GetShape as TPolygon;
+            Polygon polyA = objectA.GetShape as Polygon;
+            Polygon polyB = objectB.GetShape as Polygon;
             curManifold.ContactNumber = 0;
 
             // Ищем разделяющую ось среди с гранями полигона А
@@ -301,8 +301,8 @@ namespace PhysEngine
             int referenceIndex;
             bool flip; // Всегда указывает из объекта А в объект В
 
-            TPolygon RefPoly; 
-            TPolygon IncPoly; // Инцидентный полигон
+            Polygon RefPoly; 
+            Polygon IncPoly; // Инцидентный полигон
 
             // Определим какая фигура содержит торец полигона Ref 
             if (BiasGreaterThan(penetrationA, penetrationB))
@@ -322,25 +322,25 @@ namespace PhysEngine
             }
 
             // Определяем торец инцидентного полигона
-            Vector2D[] incidentFace = new Vector2D[2];
+            Vector[] incidentFace = new Vector[2];
             FindIncidentFace(incidentFace, RefPoly, IncPoly, referenceIndex);
 
             // Устанавливаем вершины торца полигона Ref
-            Vector2D v1 = RefPoly.Vertices[referenceIndex];
+            Vector v1 = RefPoly.Vertices[referenceIndex];
             referenceIndex = referenceIndex + 1;
             if (referenceIndex == RefPoly.VerticesCount)
                 referenceIndex = 0;
-            Vector2D v2 = RefPoly.Vertices[referenceIndex];
+            Vector v2 = RefPoly.Vertices[referenceIndex];
 
             // Переводим вершины в пространство сцены
-            v1 = (RefPoly.MatrOrient * v1) + RefPoly.Body.Position;
-            v2 = (RefPoly.MatrOrient * v2) + RefPoly.Body.Position;
+            v1 = (RefPoly.MatrixOrient * v1) + RefPoly.Body.Position;
+            v2 = (RefPoly.MatrixOrient * v2) + RefPoly.Body.Position;
 
             // Рассчитаем нормаль к лицевой грани ref полигона
-            Vector2D sidePlaneNormal = v2 - v1;
+            Vector sidePlaneNormal = v2 - v1;
             sidePlaneNormal.Normalize();
 
-            Vector2D refFaceNormal = new Vector2D(sidePlaneNormal.Y, -sidePlaneNormal.X);
+            Vector refFaceNormal = new Vector(sidePlaneNormal.Y, -sidePlaneNormal.X);
 
             // ax + by = c
             // c расстояние от тела
