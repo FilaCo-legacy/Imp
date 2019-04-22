@@ -169,21 +169,18 @@ namespace PhysEngine.Collision.BroadPhase
         /// Определяет, какие объекты возможно пересекаются с данным
         /// </summary>
         /// <param name="rectangle">Проверяемый объект</param>
-        /// <returns>Возваращет список кандидатов на пересечение</returns>
-        public List <AABB> Retrieve(AABB rectangle)
+        /// <param name="candidates">Список кандидатов на пересечение</param>
+        public void Retrieve(List<AABB> candidates, AABB rectangle)
         {
             var index = GetIndex(rectangle);
-
-            var answer = new List<AABB>();
-
+            
             if (index != -1 && !(_nodes[0] is null))
             {
-                answer.AddRange(_nodes[index].Retrieve(rectangle));
+                _nodes[index].Retrieve(candidates, rectangle);
             }
 
-            answer.AddRange(_objects);
+            candidates.AddRange(_objects);
 
-            return answer;
         }
     }
 }
