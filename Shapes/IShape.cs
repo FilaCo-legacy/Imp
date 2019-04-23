@@ -1,4 +1,6 @@
-﻿namespace PhysEngine.Shapes
+﻿using PhysEngine.Collision.BroadPhase;
+
+namespace PhysEngine.Shapes
 {
     /// <summary>
     /// Интерфейс, описывающий форму объекта
@@ -10,5 +12,11 @@
         /// </summary>
         /// <returns></returns>
         float CalculateArea();
+
+        /// <summary>
+        /// Возвращает прямоугольник, ограничивающий форму, левый верхний угол которого помещён в начало координат
+        /// </summary>
+        /// <returns></returns>
+        AABB GetBounds();
     }
 }

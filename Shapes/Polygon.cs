@@ -1,4 +1,5 @@
 ﻿using System;
+using PhysEngine.Collision.BroadPhase;
 
 namespace PhysEngine.Shapes
 {
@@ -23,7 +24,7 @@ namespace PhysEngine.Shapes
         /// <summary>
         /// Матрица поворота полигона
         /// </summary>
-        public TMat22 MatrixOrient { get; set; }
+        public Mat22 MatrixOrient { get; set; }
 
         /// <summary>
         /// Массив нормалей к рёбрам
@@ -43,7 +44,7 @@ namespace PhysEngine.Shapes
         {
             this._vertices = new Vector[ancestor.VerticesCount];
             this._normals = new Vector[ancestor.VerticesCount];
-            this.MatrixOrient = new TMat22(ancestor.MatrixOrient);
+            this.MatrixOrient = new Mat22(ancestor.MatrixOrient);
             for (int i = 0; i < _vertices.Length; ++i)
             {
                 Vertices[i] = ancestor.Vertices[i];
@@ -60,7 +61,7 @@ namespace PhysEngine.Shapes
             if (vertices.Length < 3 || vertices.Length > MAX_COUNT_VERTICES)
                 throw new Exception("The incorrect number of vertices was given");
 
-            MatrixOrient = new TMat22(0);
+            MatrixOrient = new Mat22(0);
 
             var polygonSetter = new PolygonSetter(vertices);
             polygonSetter.SetPolygon(out _vertices, out _normals);
@@ -77,7 +78,7 @@ namespace PhysEngine.Shapes
                 throw new Exception("The incorrect values of dimensions was given");
             var halfWidth = width / 2.0f;
             var halfHeight = height / 2.0f;
-            MatrixOrient = new TMat22(0);
+            MatrixOrient = new Mat22(0);
             _vertices = new Vector[4];
             _normals = new Vector[4];
             Vertices[0].Set(-halfWidth, -halfHeight);
@@ -108,9 +109,9 @@ namespace PhysEngine.Shapes
             var bestProjection = Vector.DotProduct(Vertices[0], direction);
             var bestVertex = Vertices[0];
 
-            for (int i = 1; i < VerticesCount; ++i)
+            for (var i = 1; i < VerticesCount; ++i)
             {
-                float projection = Vector.DotProduct(Vertices[i], direction);
+                var projection = Vector.DotProduct(Vertices[i], direction);
                 if (projection > bestProjection)
                 {
                     bestProjection = projection;
@@ -134,6 +135,24 @@ namespace PhysEngine.Shapes
             }
 
             return area / 2.0f;
+        }
+
+        AABB IShape.GetBounds()
+        {
+            var leftUpper = Vertices[0];
+            var rightLower = Vertices[0];
+            for (var i = 1; i < VerticesCount; ++i)
+            {
+                if (leftUpper.X > Vertices[i].X)
+                    leftUpper.X = Vertices[i].X;
+                if (leftUpper.Y > Vertices[i].Y)
+                    leftUpper.Y = Vertices[i].Y;
+                if (rightLower.X < Vertices[i].X)
+                    rightLower.X = Vertices[i].X;
+                if (rightLower.Y < Vertices[i].Y)
+                    rightLower.Y = Vertices[i].Y;
+            }
+            return new AABB(leftUpper, rightLower);
         }
     }
 }

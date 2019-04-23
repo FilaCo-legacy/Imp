@@ -33,5 +33,17 @@
             _leftUpper = new Vector(x, y);
             _rightLower = new Vector(x + width, y + height);
         }
+
+        public AABB(Vector leftUpper, float width, float height)
+        {
+            _leftUpper = leftUpper;
+            _rightLower = new Vector(leftUpper.X + width, leftUpper.Y + height);
+        }
+
+        public AABB(Vector leftUpper, Vector rightLower)
+        {
+            _leftUpper = leftUpper;
+            _rightLower = rightLower;
+        }
     }
 }

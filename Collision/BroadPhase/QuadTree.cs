@@ -35,8 +35,8 @@ namespace PhysEngine.Collision.BroadPhase
         /// </summary>
         private void Split()
         {
-            var subWidth = _bounds.Width / 2;
-            var subHeight = _bounds.Height / 2;
+            var subWidth = _bounds.Width * 0.5f;
+            var subHeight = _bounds.Height * 0.5f;
 
             var x = _bounds.LeftUpper.X;
             var y = _bounds.LeftUpper.Y;
