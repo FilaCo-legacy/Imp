@@ -105,6 +105,7 @@ namespace PhysEngine.Collision.BroadPhase
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -136,31 +137,23 @@ namespace PhysEngine.Collision.BroadPhase
         /// <param name="rectangle"></param>
         public void Insert(AABB rectangle)
         {
-            if (TryInsertChildren(rectangle))
-            {
-                return;
-            }
+            if (TryInsertChildren(rectangle))            
+                return;            
 
             _objects.Add(rectangle);
 
             if (_objects.Count > MAX_OBJECTS && _level < MAX_LEVELS)
             {
                 if (!(_nodes[0] is null))
-                {
                     Split();
-                }
-
+                
                 var i = 0;
                 while (i < _objects.Count)
                 {
-                    if (TryInsertChildren(_objects[i]))
-                    {
-                        _objects.RemoveAt(i);
-                    }
-                    else
-                    {
-                        i++;
-                    }
+                    if (TryInsertChildren(_objects[i]))                    
+                        _objects.RemoveAt(i);                    
+                    else                    
+                        i++;                    
                 }
             }
         }
@@ -175,9 +168,7 @@ namespace PhysEngine.Collision.BroadPhase
             var index = GetIndex(rectangle);
             
             if (index != -1 && !(_nodes[0] is null))
-            {
                 _nodes[index].Retrieve(candidates, rectangle);
-            }
 
             candidates.AddRange(_objects);
 

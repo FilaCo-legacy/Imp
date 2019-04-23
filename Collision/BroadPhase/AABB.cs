@@ -34,16 +34,21 @@
             _rightLower = new Vector(x + width, y + height);
         }
 
-        public AABB(Vector leftUpper, float width, float height)
-        {
-            _leftUpper = leftUpper;
-            _rightLower = new Vector(leftUpper.X + width, leftUpper.Y + height);
-        }
-
         public AABB(Vector leftUpper, Vector rightLower)
         {
             _leftUpper = leftUpper;
             _rightLower = rightLower;
+        }
+
+        public static bool AreCollided(AABB a, AABB b)
+        {
+            if (a.RightLower.X < b.LeftUpper.X || a.LeftUpper.X > b.RightLower.X)            
+                return false;
+            
+            if (a.RightLower.Y < b.LeftUpper.Y || b.LeftUpper.Y > b.RightLower.Y)
+                return false;            
+
+            return true;
         }
     }
 }
