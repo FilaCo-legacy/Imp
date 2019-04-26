@@ -4,19 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhysEngine
+namespace PhysEngine.Common
 {
-    public class DefaultVectorComparator : IComparer<Vector>
+    internal class DefaultVectorComparator : IComparer<Vector>
     {
-        int IComparer<Vector>.Compare(Vector a, Vector b)
+        int IComparer<Vector>.Compare(Vector vA, Vector vB)
         {
-            if (Math.Abs(a.X - b.X) < PhysEngineConsts.EPS)
+            if (Math.Abs(vA.X - vB.X) < PhysEngineDefaults.EPS)
             {
-                if (Math.Abs(a.Y - b.Y) < PhysEngineConsts.EPS)
+                if (Math.Abs(vA.Y - vB.Y) < PhysEngineDefaults.EPS)
                     return 0;
-                return a.Y.CompareTo(b.Y);
+                return vA.Y.CompareTo(vB.Y);
             }
-            return a.X.CompareTo(b.X);
+            return vA.X.CompareTo(vB.X);
         }
     }
 }

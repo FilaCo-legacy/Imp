@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace PhysEngine.Collision.BroadPhase
+namespace PhysEngine.CollisionDetection.BroadPhase.DataStructures
 {
     /// <summary>
-    /// Структура данных дерево квандрантов
+    /// Структура данных "Дерево квадрантов"
     /// </summary>
-    public class QuadTree
+    public class QuadTree <T> where T:IBoxable
     {
         public const int MAX_OBJECTS = 10;
         public const int MAX_LEVELS = 5;
@@ -16,9 +16,9 @@ namespace PhysEngine.Collision.BroadPhase
         private int _level;
 
         /// <summary>
-        /// Объекты, представленные в виде AABB, находящиеся в данной вершине
+        /// Объекты, находящиеся в данной вершине
         /// </summary>
-        private List<AABB> _objects;
+        private List<T> _objects;
 
         /// <summary>
         /// Границы данной вершины на внешней карте
@@ -28,7 +28,7 @@ namespace PhysEngine.Collision.BroadPhase
         /// <summary>
         /// Дочерние узлы дерева
         /// </summary>
-        private QuadTree[] _nodes;
+        private QuadTree<T>[] _nodes;
 
         /// <summary>
         /// Разделение узла дерева и определение его четырёх потомков
@@ -41,10 +41,10 @@ namespace PhysEngine.Collision.BroadPhase
             var x = _bounds.LeftUpper.X;
             var y = _bounds.LeftUpper.Y;
 
-            _nodes[0] = new QuadTree(_level + 1, new AABB(x + subWidth, y, subWidth, subHeight));
-            _nodes[1] = new QuadTree(_level + 1, new AABB(x, y, subWidth, subHeight));
-            _nodes[2] = new QuadTree(_level + 1, new AABB(x, y + subWidth, subWidth, subHeight));
-            _nodes[3] = new QuadTree(_level + 1, new AABB(x + subWidth, y + subHeight, subWidth, subHeight));
+            _nodes[0] = new QuadTree<T>(_level + 1, new AABB(x + subWidth, y, subWidth, subHeight));
+            _nodes[1] = new QuadTree<T>(_level + 1, new AABB(x, y, subWidth, subHeight));
+            _nodes[2] = new QuadTree<T>(_level + 1, new AABB(x, y + subWidth, subWidth, subHeight));
+            _nodes[3] = new QuadTree<T>(_level + 1, new AABB(x + subWidth, y + subHeight, subWidth, subHeight));
         }
 
         private bool IsInTopQuadrants(AABB rectangle)
@@ -93,15 +93,15 @@ namespace PhysEngine.Collision.BroadPhase
             return index;
         }
 
-        private bool TryInsertChildren(AABB rectangle)
+        private bool TryInsertChildren(T obj)
         {
             if (!(_nodes[0] is null))
             {
-                var index = GetIndex(rectangle);
+                var index = GetIndex(obj.GetBox);
 
                 if (index != -1)
                 {
-                    _nodes[index].Insert(rectangle);
+                    _nodes[index].Insert(obj);
                     return true;
                 }
             }
@@ -113,8 +113,8 @@ namespace PhysEngine.Collision.BroadPhase
         {
             _level = level;
             _bounds = bounds;
-            _nodes = new QuadTree[4];
-            _objects = new List<AABB>();
+            _nodes = new QuadTree<T>[4];
+            _objects = new List<T>();
         }
 
         public void Clear()
@@ -134,13 +134,13 @@ namespace PhysEngine.Collision.BroadPhase
         /// <summary>
         /// Помещает новый объект в дерево
         /// </summary>
-        /// <param name="rectangle"></param>
-        public void Insert(AABB rectangle)
+        /// <param name="obj"></param>
+        public void Insert(T obj)
         {
-            if (TryInsertChildren(rectangle))            
+            if (TryInsertChildren(obj))            
                 return;            
 
-            _objects.Add(rectangle);
+            _objects.Add(obj);
 
             if (_objects.Count > MAX_OBJECTS && _level < MAX_LEVELS)
             {
@@ -161,14 +161,14 @@ namespace PhysEngine.Collision.BroadPhase
         /// <summary>
         /// Определяет, какие объекты возможно пересекаются с данным
         /// </summary>
-        /// <param name="rectangle">Проверяемый объект</param>
+        /// <param name="targetObj">Проверяемый объект</param>
         /// <param name="candidates">Список кандидатов на пересечение</param>
-        public void Retrieve(List<AABB> candidates, AABB rectangle)
+        public void Retrieve(List<T> candidates, T targetObj)
         {
-            var index = GetIndex(rectangle);
+            var index = GetIndex(targetObj.GetBox);
             
             if (index != -1 && !(_nodes[0] is null))
-                _nodes[index].Retrieve(candidates, rectangle);
+                _nodes[index].Retrieve(candidates, targetObj);
 
             candidates.AddRange(_objects);
 

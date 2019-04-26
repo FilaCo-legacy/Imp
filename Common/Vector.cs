@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PhysEngine
+namespace PhysEngine.Common
 {
     /// <summary>
     /// Представляет вектор на плоскости
@@ -54,9 +54,9 @@ namespace PhysEngine
             return new Vector(-vector.X, -vector.Y);
         }
 
-        public static Vector operator -(Vector a, Vector b)
+        public static Vector operator -(Vector vA, Vector vB)
         {
-            return new Vector(a.X - b.X, a.Y - b.Y);
+            return new Vector(vA.X - vB.X, vA.Y - vB.Y);
         }
 
         public static Vector operator -(Vector vector, float value)
@@ -64,9 +64,9 @@ namespace PhysEngine
             return new Vector(vector.X - value, vector.Y - value);
         }
 
-        public static Vector operator +(Vector a, Vector b)
+        public static Vector operator +(Vector vA, Vector vB)
         {
-            return new Vector(a.X + b.X, a.Y + b.Y);
+            return new Vector(vA.X + vB.X, vA.Y + vB.Y);
         }
 
         public static Vector operator +(Vector vector, float value)
@@ -89,14 +89,14 @@ namespace PhysEngine
             return new Vector(vec.X * multiplier, vec.Y * multiplier);
         }
 
-        public static bool operator ==(Vector a, Vector b)
+        public static bool operator ==(Vector vA, Vector vB)
         {
-            return a.X == b.X && a.Y == b.Y;
+            return vA.X == vB.X && vA.Y == vB.Y;
         }
 
-        public static bool operator !=(Vector a, Vector b)
+        public static bool operator !=(Vector vA, Vector vB)
         {
-            return a.X != b.X || a.Y != b.Y;
+            return vA.X != vB.X || vA.Y != vB.Y;
         }
         #endregion
 
@@ -114,12 +114,12 @@ namespace PhysEngine
         /// <summary>
         /// Векторное произведение двух экземпляров структуры <see cref="Vector"/>
         /// </summary>
-        /// <param name="a">Первый вектор</param>
-        /// <param name="b">Второй вектор</param>
+        /// <param name="vA">Первый вектор</param>
+        /// <param name="vB">Второй вектор</param>
         /// <returns>Длина вектора-результата</returns>
-        public static float CrossProduct(Vector a, Vector b)
+        public static float CrossProduct(Vector vA, Vector vB)
         {
-            return a.X * b.Y - a.Y * b.X;
+            return vA.X * vB.Y - vA.Y * vB.X;
         }
 
         /// <summary>
@@ -147,12 +147,12 @@ namespace PhysEngine
         /// <summary>
         /// Скалярное произведение двух экземпляров структуры <see cref="Vector"/>
         /// </summary>
-        /// <param name="a">Первый вектор</param>
-        /// <param name="b">Второй вектор</param>
+        /// <param name="vA">Первый вектор</param>
+        /// <param name="vB">Второй вектор</param>
         /// <returns></returns>
-        public static float DotProduct(Vector a, Vector b)
+        public static float DotProduct(Vector vA, Vector vB)
         {
-            return a.X * b.X + a.Y * b.Y;
+            return vA.X * vB.X + vA.Y * vB.Y;
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace PhysEngine
         {
             var length = Length;
 
-            if (length < PhysEngineConsts.EPS)
+            if (length < PhysEngineDefaults.EPS)
                 return;
 
             var invLen = 1.0f / Length;

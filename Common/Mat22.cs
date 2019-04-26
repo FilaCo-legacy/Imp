@@ -1,30 +1,28 @@
 ﻿using System;
 
-namespace PhysEngine
+namespace PhysEngine.Common
 {
     /// <summary>
     /// Структура представляющая матрицу поворота 2х2
     /// </summary>
     public struct Mat22
     {
-        private float[,] matr;
-
         /// <summary>
         /// Элементы матрицы
         /// </summary>
-        public float[,] Matr => matr;
+        public float[,] Matr { get; }
 
         /// <summary>
         /// Вектор из значений первого столбца
         /// </summary>
-        public Vector GetColumnX => new Vector(matr[0, 0], matr[0, 1]);
+        public Vector GetColumnX => new Vector(Matr[0, 0], Matr[0, 1]);
 
         /// <summary>
         /// Вектор из значений второго столбца
         /// </summary>
-        public Vector GetColumnY => new Vector(matr[1, 0], matr[1, 1]);
+        public Vector GetColumnY => new Vector(Matr[1, 0], Matr[1, 1]);
 
-        public float this [int i, int j] { get => matr[i, j]; set => matr[i, j] = value; }
+        public float this [int i, int j] { get => Matr[i, j]; set => Matr[i, j] = value; }
 
         /// <summary>
         /// Инициализирует новый объект <see cref="Mat22"/> из двух векторов
@@ -33,11 +31,11 @@ namespace PhysEngine
         /// <param name="valueY"></param>
         public Mat22(Vector valueX, Vector valueY)
         {
-            matr = new float[2, 2];
-            matr[0, 0] = valueX.X;
-            matr[0, 1] = valueX.Y;
-            matr[1, 0] = valueY.X;
-            matr[1, 1] = valueY.Y;
+            Matr = new float[2, 2];
+            Matr[0, 0] = valueX.X;
+            Matr[0, 1] = valueX.Y;
+            Matr[1, 0] = valueY.X;
+            Matr[1, 1] = valueY.Y;
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace PhysEngine
         /// <param name="angleRad">Угол в радианах</param>
         public Mat22(float angleRad)
         {
-            matr = new float[2, 2];
+            Matr = new float[2, 2];
             Set(angleRad);
         }
 
@@ -56,11 +54,11 @@ namespace PhysEngine
         /// <param name="angleRad">Угол в радианах</param>
         public Mat22(float m00, float m01, float m10, float m11)
         {
-            matr = new float[2, 2];
-            matr[0, 0] = m00;
-            matr[0, 1] = m01;
-            matr[1, 0] = m10;
-            matr[1, 1] = m11;
+            Matr = new float[2, 2];
+            Matr[0, 0] = m00;
+            Matr[0, 1] = m01;
+            Matr[1, 0] = m10;
+            Matr[1, 1] = m11;
         }
 
         /// <summary>
@@ -69,10 +67,10 @@ namespace PhysEngine
         /// <param name="pref"></param>
         public Mat22(Mat22 pref)
         {
-            matr = new float[2, 2];
+            Matr = new float[2, 2];
             for (int i = 0; i < 2; ++i)
                 for (int j = 0; j < 2; ++j)
-                    matr[i, j] = pref[i, j];
+                    Matr[i, j] = pref[i, j];
         }
 
         /// <summary>
@@ -83,10 +81,10 @@ namespace PhysEngine
         {
             var cosAngle = (float)Math.Cos(angleRad);
             var sinAngle = (float)Math.Sin(angleRad);
-            matr[0, 0] = cosAngle;
-            matr[0, 1] = -sinAngle;
-            matr[1, 0] = sinAngle;
-            matr[1, 1] = cosAngle;
+            Matr[0, 0] = cosAngle;
+            Matr[0, 1] = -sinAngle;
+            Matr[1, 0] = sinAngle;
+            Matr[1, 1] = cosAngle;
         }
 
         /// <summary>
@@ -95,7 +93,7 @@ namespace PhysEngine
         /// <returns></returns>
         public Mat22 Transpose()
         {
-            return new Mat22(matr[0, 0], matr[1, 0], matr[0, 1], matr[1, 1]);
+            return new Mat22(Matr[0, 0], Matr[1, 0], Matr[0, 1], Matr[1, 1]);
         }
 
         /// <summary>

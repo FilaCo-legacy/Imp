@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysEngine", "PhysEngine.csproj", "{D20A0369-79F6-4440-A546-558396A28CA1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PixiTest", "..\PixiTest\PixiTest.csproj", "{D4D927E2-9D6E-47A5-B058-9547F8545898}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D20A0369-79F6-4440-A546-558396A28CA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D20A0369-79F6-4440-A546-558396A28CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D20A0369-79F6-4440-A546-558396A28CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D20A0369-79F6-4440-A546-558396A28CA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4D927E2-9D6E-47A5-B058-9547F8545898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4D927E2-9D6E-47A5-B058-9547F8545898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4D927E2-9D6E-47A5-B058-9547F8545898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4D927E2-9D6E-47A5-B058-9547F8545898}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {36541FE7-BAA5-4D03-A939-B5302C47EAED}
+	EndGlobalSection
+EndGlobal

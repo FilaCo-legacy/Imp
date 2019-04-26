@@ -1,7 +1,7 @@
 ﻿using System;
-using PhysEngine.Collision.BroadPhase;
+using PhysEngine.CollisionDetection.BroadPhase;
 
-namespace PhysEngine.Shapes
+namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
 {
     /// <summary>
     /// Представляет собой окружность
@@ -11,7 +11,7 @@ namespace PhysEngine.Shapes
         /// <summary>
         /// Радиус окружности
         /// </summary>
-        public float Radius { get; set; }
+        public float Radius { get; }
 
         /// <summary>
         /// Инициализирует объект структуры <see cref="Circle"/>
@@ -40,7 +40,7 @@ namespace PhysEngine.Shapes
             return (float)Math.PI * Radius * Radius;
         }
 
-        AABB IShape.GetBounds()
+        AABB IShape.GetBox()
         {
             return new AABB(0, 0, Radius, Radius);
         }

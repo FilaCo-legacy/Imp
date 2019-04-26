@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhysEngine.Shapes
+namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
 {
     /// <summary>
     /// Класс, представляющий собой метод преобразования массива точек в полигон с помощью построения МВО.
@@ -125,7 +125,7 @@ namespace PhysEngine.Shapes
                     next = 0;
                 Vector face = outputVertices[next] - outputVertices[i];
 
-                if (face.LengthSquared < PhysEngineConsts.EPS * PhysEngineConsts.EPS)
+                if (face.LengthSquared < PhysEngineDefaults.EPS * PhysEngineDefaults.EPS)
                     throw new Exception("Длина ребра полигона равна 0");
 
                 normals[i] = new Vector(face.Y, -face.X);

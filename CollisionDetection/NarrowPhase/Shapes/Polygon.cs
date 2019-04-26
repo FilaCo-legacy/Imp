@@ -1,7 +1,7 @@
 ﻿using System;
-using PhysEngine.Collision.BroadPhase;
+using PhysEngine.CollisionDetection.BroadPhase;
 
-namespace PhysEngine.Shapes
+namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
 {
     /// <summary>
     /// Структура, представляющая форму тела "полигон"
@@ -12,14 +12,11 @@ namespace PhysEngine.Shapes
         /// Максимальное кол-во вершин в полигоне
         /// </summary>
         public const int MAX_COUNT_VERTICES = 16;
-
-        private Vector[] _vertices;
-        private Vector[] _normals;
         
         /// <summary>
         /// Количество вершин в полигоне
         /// </summary>
-        public int VerticesCount => _vertices.Length;
+        public int VerticesCount => Vertices.Length;
 
         /// <summary>
         /// Матрица поворота полигона
@@ -29,12 +26,12 @@ namespace PhysEngine.Shapes
         /// <summary>
         /// Массив нормалей к рёбрам
         /// </summary>
-        public Vector[] Normals => _normals;
+        public Vector[] Normals { get; }
 
         /// <summary>
         /// Массив вершин полигона
         /// </summary>
-        public Vector[] Vertices => _vertices;
+        public Vector[] Vertices { get; }
 
         /// <summary>
         /// Инициализирует новый объект формы <see cref="Polygon"/> на основе уже существующей
@@ -42,10 +39,10 @@ namespace PhysEngine.Shapes
         /// <param name="ancestor">Форма, копия которой будет создана</param>
         public Polygon(Polygon ancestor)
         {
-            this._vertices = new Vector[ancestor.VerticesCount];
-            this._normals = new Vector[ancestor.VerticesCount];
+            this.Vertices = new Vector[ancestor.VerticesCount];
+            this.Normals = new Vector[ancestor.VerticesCount];
             this.MatrixOrient = new Mat22(ancestor.MatrixOrient);
-            for (int i = 0; i < _vertices.Length; ++i)
+            for (int i = 0; i < Vertices.Length; ++i)
             {
                 Vertices[i] = ancestor.Vertices[i];
                 Normals[i] = ancestor.Normals[i];
@@ -64,7 +61,11 @@ namespace PhysEngine.Shapes
             MatrixOrient = new Mat22(0);
 
             var polygonSetter = new PolygonSetter(vertices);
-            polygonSetter.SetPolygon(out _vertices, out _normals);
+            Vector[] tmpVertices, tmpNormals;
+            polygonSetter.SetPolygon(out tmpVertices, out tmpNormals);
+
+            Vertices = tmpVertices;
+            Normals = tmpNormals;
         }
 
         /// <summary>
@@ -74,13 +75,17 @@ namespace PhysEngine.Shapes
         /// <param name="height">Высота прямоугольника</param>
         public Polygon(float width, float height)
         {
-            if (width <= 0 || height <= 0)
-                throw new Exception("The incorrect values of dimensions was given");
+            if (width <= 0)
+                throw new Exception("The width has a non-positive value");
+
+            if (height <= 0)
+                throw new Exception("The height has a non-positive value");
+
             var halfWidth = width / 2.0f;
             var halfHeight = height / 2.0f;
             MatrixOrient = new Mat22(0);
-            _vertices = new Vector[4];
-            _normals = new Vector[4];
+            Vertices = new Vector[4];
+            Normals = new Vector[4];
             Vertices[0].Set(-halfWidth, -halfHeight);
             Vertices[1].Set(halfWidth, -halfHeight);
             Vertices[2].Set(halfWidth, halfHeight);
@@ -137,7 +142,7 @@ namespace PhysEngine.Shapes
             return area / 2.0f;
         }
 
-        AABB IShape.GetBounds()
+        AABB IShape.GetBox()
         {
             var leftUpper = Vertices[0];
             var rightLower = Vertices[0];

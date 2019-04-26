@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PhysEngine.CollisionDetection.BroadPhase.DataStructures;
 
 namespace PhysEngine.CollisionDetection.BroadPhase
 {
@@ -13,9 +14,9 @@ namespace PhysEngine.CollisionDetection.BroadPhase
     /// <summary>
     /// Класс, отвечающий за "Широкую фазу" разрешения коллизий.
     /// </summary>
-    class BroadPhaseManager
+    class BroadPhaseManager <T> where T: IBoxable, IPhysObject
     {
-        private QuadTree _quadTree;
+        private QuadTree<T> _quadTree;
 
         private MaskFilter _maskFilter;
 
@@ -24,9 +25,9 @@ namespace PhysEngine.CollisionDetection.BroadPhase
         /// </summary>
         /// <param name="candidates"></param>
         /// <param name="targetObject"></param>
-        private void FilterNonCollided(List<IPhysObject> candidates, IPhysObject targetObject)
+        private void FilterNonCollided(List<T> candidates, T targetObject)
         {
-            candidates.RemoveAll(curObject => AABB.AreCollided(curObject.Box, targetObject.Box) == false ||
+            candidates.RemoveAll(curObject => AABB.AreCollided(curObject.GetBox, targetObject.GetBox) == false ||
                 _maskFilter.Invoke(curObject, targetObject)  == false);
         }
 
@@ -38,23 +39,23 @@ namespace PhysEngine.CollisionDetection.BroadPhase
         /// <param name="maskFilter">Делегат, определяющий правила сталкивания объектов</param>
         BroadPhaseManager(int sceneWidth, int sceneHeight, MaskFilter maskFilter)
         {
-            _quadTree = new QuadTree(0, new AABB(0, 0, sceneWidth, sceneHeight));
+            _quadTree = new QuadTree<T>(0, new AABB(0, 0, sceneWidth, sceneHeight));
             _maskFilter = maskFilter;
         }
 
         /// <summary>
         /// Добавляет все объекты в дерево квандрантов для последующего анализа
         /// </summary>
-        /// <param name="physObjects"></param>
-        public void Initialize(List<IPhysObject> physObjects)
+        /// <param name="objects"></param>
+        public void Initialize(List<T> objects)
         {
-            foreach (var curObject in physObjects)
+            foreach (var curObject in objects)
                 _quadTree.Insert(curObject);
         }
 
-        public List<IPhysObject> GetCandidates(IPhysObject physObject)
+        public List<T> GetCandidates(T physObject)
         {
-            var candidates = new List<IPhysObject>();
+            var candidates = new List<T>();
 
             _quadTree.Retrieve(candidates, physObject);
             FilterNonCollided(candidates, physObject);

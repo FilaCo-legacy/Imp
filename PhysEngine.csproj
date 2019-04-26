@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D20A0369-79F6-4440-A546-558396A28CA1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PhysEngine</RootNamespace>
+    <AssemblyName>PhysEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CollisionDetection\BroadPhase\BroadPhaseManager.cs" />
+    <Compile Include="CollisionDetection\BroadPhase\AABB.cs" />
+    <Compile Include="CollisionDetection\BroadPhase\DataStructures\QuadTree.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\DataStructures\NodesInspector.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackNode.cs" />
+    <Compile Include="Common\DefaultVectorComparator.cs" />
+    <Compile Include="CollisionDetection\BroadPhase\IBoxable.cs" />
+    <Compile Include="Common\PhysEngineDefaults.cs" />
+    <Compile Include="Common\IPhysObject.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\NarrowPhaseManager.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackTree.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\Shapes\PolygonSetter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\Shapes\Circle.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\Shapes\Polygon.cs" />
+    <Compile Include="Common\Mat22.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\Shapes\IShape.cs" />
+    <Compile Include="Common\Vector.cs" />
+    <Compile Include="Scene.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
