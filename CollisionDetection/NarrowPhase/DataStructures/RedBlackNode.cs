@@ -9,20 +9,22 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
     /// <typeparam name="TValue"></typeparam>
     internal class RedBlackNode<TKey, TValue>
     {
-        internal static bool IsRed(RedBlackNode<TKey, TValue> node)
+        public static bool IsRed(RedBlackNode<TKey, TValue> node)
         {
             return node != null && node.Red;
         }
 
-        internal TKey Key { get; set; }
+        public TKey Key { get; set; }
 
-        internal TValue Value { get; set; }
+        public TValue Value { get; set; }
 
-        internal bool Red { get; set; }
+        public bool Red { get; set; }
 
-        internal RedBlackNode<TKey, TValue> Left { get; set; }
+        public RedBlackNode<TKey, TValue> Left { get; set; }
 
         public RedBlackNode<TKey, TValue> Right { get; set; }
+
+        public RedBlackNode<TKey, TValue> Next => this.Right.FindMinDescendant();
 
         /// <summary>
         /// Представляет доступ к детям по индексу
@@ -49,6 +51,15 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
                 throw new Exception("Некорректный индекс ребёнка подан на вход");
             }
+        }
+
+        public RedBlackNode(TKey key, TValue value)
+        {
+            Key = key;
+            Value = value;
+            Red = true;
+            Left = null;
+            Right = null;
         }
 
         /// <summary>
@@ -81,13 +92,22 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             return this.SingleRotate(dir);
         }
 
-        public RedBlackNode(TKey key, TValue value)
+        public RedBlackNode<TKey, TValue> FindMinDescendant()
         {
-            Key = key;
-            Value = value;
-            Red = true;
-            Left = null;
-            Right = null;
+            if (this.Left != null)
+                return this.Left.FindMinDescendant();
+            return this;
+        }        
+
+        public static void Swap(RedBlackNode<TKey, TValue> nodeA, RedBlackNode<TKey, TValue> nodeB)
+        {
+            var tmpKey = nodeA.Key;
+            nodeA.Key = nodeB.Key;
+            nodeB.Key = tmpKey;
+
+            var tmpValue = nodeA.Value;
+            nodeA.Value = nodeB.Value;
+            nodeB.Value = tmpValue;
         }
     }
 }

@@ -11,15 +11,15 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
         private const int LEFT = 0;
         private const int RIGHT = 1;
 
-        private RedBlackTree<TKey, TValue> _tree;
+        private RedBlackNode<TKey, TValue> _root;
 
-        internal void FixAfterInsert(RedBlackNode<TKey, TValue> node, RedBlackNode<TKey, TValue> nodeParent,
+        public void FixAfterInsert(RedBlackNode<TKey, TValue> node, RedBlackNode<TKey, TValue> nodeParent,
             RedBlackNode<TKey, TValue> nodeGrandParent)
         {
 
         }
 
-        internal void FixAfterErase(RedBlackNode<TKey, TValue> node, RedBlackNode<TKey, TValue> nodeParent,
+        public void FixAfterErase(RedBlackNode<TKey, TValue> node, RedBlackNode<TKey, TValue> nodeParent,
             RedBlackNode<TKey, TValue> nodeGrandParent)
         {
 

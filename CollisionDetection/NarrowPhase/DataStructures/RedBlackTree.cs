@@ -12,12 +12,17 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
         private IComparer<TKey> _comparer;
 
-        internal RedBlackNode<TKey, TValue> Root { get; private set; } 
-        
+        private RedBlackNode<TKey, TValue> _root;
+
+        public int Count
+        {
+            get;
+        }
+
         private RedBlackNode<TKey, TValue> FindNode(TKey key, out RedBlackNode<TKey, TValue> parent, 
             out RedBlackNode<TKey, TValue> grandParent)
         {
-            var cur = Root;
+            var cur = _root;
             parent = null;
             grandParent = null;
 
@@ -52,9 +57,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             var cur = FindNode(key, out parent, out grandParent);
 
             return cur;
-        }
-
-        public int Count { get; }
+        }        
 
         public void Insert(TKey key, TValue value)
         {
@@ -80,6 +83,29 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
             if (cur == null)
                 return;
+
+            var ind = _comparer.Compare(cur.Key, parent.Key) == 1 ? 1 : 0;
+
+            if (cur.Left == null && cur.Right == null)
+            {
+                parent[ind] = null;
+            }
+            else if (cur.Left == null && cur.Right != null)
+            {
+                parent[ind] = cur.Right;
+            }
+            else if (cur.Left != null && cur.Right == null)
+            {
+                parent[ind] = cur.Left;
+            }
+            else
+            {
+                var nextNode = cur.Next;
+                RedBlackNode<TKey, TValue>.Swap(cur, nextNode);
+                this.Erase(nextNode.Key);
+            }
+
+            _inspector.FixAfterErase(cur, parent, grandParent);
         }
 
         public bool Contains(TKey key)
