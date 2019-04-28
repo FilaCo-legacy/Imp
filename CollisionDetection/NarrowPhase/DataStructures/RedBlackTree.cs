@@ -16,11 +16,16 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
         public int Count
         {
-            get;
+            get
+            {
+                if (_root != null)
+                    return _root.Count;
+
+                return 0;
+            }
         }
 
-        private RedBlackNode<TKey, TValue> FindNode(TKey key, out RedBlackNode<TKey, TValue> parent, 
-            out RedBlackNode<TKey, TValue> grandParent)
+        private RedBlackNode<TKey, TValue> FindNode(TKey key)
         {
             var cur = _root;
             parent = null;
@@ -61,6 +66,13 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
         public void Insert(TKey key, TValue value)
         {
+            if (_root == null)
+            {
+                _root = new RedBlackNode<TKey, TValue>(key, value);
+                _inspector.FixAfterInsert(_root, null, null);
+                return;
+            }
+
             RedBlackNode<TKey, TValue> parent, grandParent;
             var cur = FindNode(key, out parent, out grandParent);
 
@@ -84,25 +96,30 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             if (cur == null)
                 return;
 
+            if (cur.HasNoChildren)
+            {
+                if (cur == _root)
+                   _root = null;
+                else
+                {
+                    if (parent.Left == cur)
+                        parent.Left = null;
+                    else
+                        parent.Right = null;
+                }
+            }
+
             var ind = _comparer.Compare(cur.Key, parent.Key) == 1 ? 1 : 0;
 
-            if (cur.Left == null && cur.Right == null)
-            {
-                parent[ind] = null;
-            }
-            else if (cur.Left == null && cur.Right != null)
-            {
+            if (cur.HasOnlyRightChild)
                 parent[ind] = cur.Right;
-            }
-            else if (cur.Left != null && cur.Right == null)
-            {
+            else if (cur.HasOnlyLeftChild)
                 parent[ind] = cur.Left;
-            }
             else
             {
                 var nextNode = cur.Next;
                 RedBlackNode<TKey, TValue>.Swap(cur, nextNode);
-                this.Erase(nextNode.Key);
+                Erase(nextNode.Key);
             }
 
             _inspector.FixAfterErase(cur, parent, grandParent);
@@ -117,8 +134,23 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
         public TValue this[TKey key]
         {
-            get => FindNode(key).Value;
-            set => FindNode(key).Value = value;
+            get
+            {
+                var res = FindNode(key);
+                if (res == null)
+                    throw new Exception("Элемент с таким ключом не был найден");
+
+                return res.Value;
+            }
+            set
+            {
+                var res = FindNode(key);
+
+                if (res == null)
+                    Insert(key, value);
+                else
+                    res.Value = value;
+            }
         }
     }
 }

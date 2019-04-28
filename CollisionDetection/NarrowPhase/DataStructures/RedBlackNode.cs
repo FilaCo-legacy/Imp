@@ -9,22 +9,90 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
     /// <typeparam name="TValue"></typeparam>
     internal class RedBlackNode<TKey, TValue>
     {
-        public static bool IsRed(RedBlackNode<TKey, TValue> node)
-        {
-            return node != null && node.Red;
-        }
-
         public TKey Key { get; set; }
 
         public TValue Value { get; set; }
 
         public bool Red { get; set; }
 
+        public RedBlackNode<TKey, TValue> Parent { get; set; }
+
         public RedBlackNode<TKey, TValue> Left { get; set; }
 
         public RedBlackNode<TKey, TValue> Right { get; set; }
 
-        public RedBlackNode<TKey, TValue> Next => this.Right.FindMinDescendant();
+        public RedBlackNode<TKey, TValue> GrandParent
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.Parent;
+
+                return null;
+            }
+        }
+
+        public RedBlackNode<TKey, TValue> Uncle
+        {
+            get
+            {
+                var grandParent = GrandParent;
+
+                if (grandParent == null)
+                    return null;
+
+                if (Parent == grandParent.Left)
+                    return grandParent.Right;
+                else
+                    return grandParent.Left;
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                var res = 1;
+
+                if (Left != null)
+                    res += Left.Count;
+
+                if (Right != null)
+                    res += Right.Count;
+
+                return res;
+            }
+        }
+
+        public bool HasNoChildren => Left == null && Right == null;
+
+        public bool HasOnlyLeftChild => Left != null && Right == null;
+
+        public bool HasOnlyRightChild => Left == null && Right != null;
+
+        public bool HasBothChildren => Left != null && Right != null;
+
+        public RedBlackNode<TKey, TValue> Pref
+        {
+            get
+            {
+                if (Left == null)
+                    return Parent;
+
+                return Left.FindMaxDescendant();
+            }
+        }
+
+        public RedBlackNode<TKey, TValue> Next
+        {
+            get
+            {
+                if (Right == null)
+                    return Parent;
+
+                return Right.FindMinDescendant();
+            }
+        }
 
         /// <summary>
         /// Представляет доступ к детям по индексу
@@ -53,6 +121,20 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             }
         }
 
+        private RedBlackNode<TKey, TValue> FindMinDescendant()
+        {
+            if (Left != null)
+                return Left.FindMinDescendant();
+            return this;
+        }
+
+        private RedBlackNode<TKey, TValue> FindMaxDescendant()
+        {
+            if (Right != null)
+                return Right.FindMaxDescendant();
+            return this;
+        }
+
         public RedBlackNode(TKey key, TValue value)
         {
             Key = key;
@@ -71,10 +153,13 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
         {
             var save = this[1 - dir];
 
+            if (save == null)
+                throw new Exception("Вершина не имела нужного для поворота сына");
+
             this[1 - dir] = save[dir];
             save[dir] = this;
 
-            this.Red = true;
+            Red = true;
             save.Red = false;
 
             return save;
@@ -89,15 +174,8 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
         {
             this[1 - dir] = this[1 - dir].SingleRotate(1 - dir);
 
-            return this.SingleRotate(dir);
+            return SingleRotate(dir);
         }
-
-        public RedBlackNode<TKey, TValue> FindMinDescendant()
-        {
-            if (this.Left != null)
-                return this.Left.FindMinDescendant();
-            return this;
-        }        
 
         public static void Swap(RedBlackNode<TKey, TValue> nodeA, RedBlackNode<TKey, TValue> nodeB)
         {
@@ -108,6 +186,11 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             var tmpValue = nodeA.Value;
             nodeA.Value = nodeB.Value;
             nodeB.Value = tmpValue;
+        }
+
+        public static bool IsRed(RedBlackNode<TKey, TValue> node)
+        {
+            return node != null && node.Red;
         }
     }
 }
