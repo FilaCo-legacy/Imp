@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 {
@@ -16,6 +13,17 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
         private RedBlackNode<TKey, TValue> _root;
 
         public bool Empty => _root == null;
+
+        public int Count
+        {
+            get
+            {
+                if (_root == null)
+                    return 0;
+
+                return _root.Count;
+            }
+        }
 
         public TValue this[TKey key]
         {
@@ -37,11 +45,6 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                 else
                     node.Value = value;
             }
-        }
-
-        private static bool IsRed(RedBlackNode<TKey, TValue> node)
-        {
-            return node != null && node.Red;
         }
 
         private RedBlackNode<TKey, TValue> FindNode (TKey key)
@@ -106,7 +109,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                         cur = new RedBlackNode<TKey, TValue>(key, value);
                         parent[dir] = cur;
                     }
-                    else if (IsRed(cur[LEFT]) && IsRed(cur[RIGHT]))
+                    else if (RedBlackNode<TKey, TValue>.IsRed(cur[LEFT]) && RedBlackNode<TKey, TValue>.IsRed(cur[RIGHT]))
                     {
                         // Смена цветов
                         cur.Red = true;
@@ -115,7 +118,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                     }
 
                     // Исправление "красного" нарушения
-                    if (IsRed(cur) && IsRed(parent))
+                    if (RedBlackNode<TKey, TValue>.IsRed(cur) && RedBlackNode<TKey, TValue>.IsRed(parent))
                     {
                         var sndDir = tmpHead[RIGHT] == grandParent ? 1 : 0;
 
@@ -130,7 +133,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                         break;
 
                     last = dir;
-                    dir = _comparer.Compare(key, cur.Key) == -1 ? 1 : 0;
+                    dir = _comparer.Compare(key, cur.Key) == -1 ? 0 : 1;
 
                     if (grandParent != null)
                         tmpHead = grandParent;
@@ -169,16 +172,16 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                     grandParent = parent;
                     parent = cur;
                     cur = cur[dir];
-                    dir = _comparer.Compare(key, cur.Key) == -1 ? 1 : 0;
+                    dir = _comparer.Compare(key, cur.Key) == -1 ? 0 : 1;
 
                     // Сохраняем найденную вершину
                     if (_comparer.Compare(key, cur.Key) == 0)
                         foundNode = cur;
 
                     // Толкаем красные вершины вниз
-                    if (!IsRed(cur) && !IsRed(cur[dir]))
+                    if (!RedBlackNode<TKey, TValue>.IsRed(cur) && !RedBlackNode<TKey, TValue>.IsRed(cur[dir]))
                     { 
-                        if (IsRed(cur[1 - dir]))
+                        if (RedBlackNode<TKey, TValue>.IsRed(cur[1 - dir]))
                         {
                             parent[last] = cur.SingleRotate(dir);
                             parent = parent[last];
@@ -189,20 +192,20 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
                             if (save != null)
                             {
-                                if (!IsRed(save[1-last]) && !IsRed(save[1 - last]))
+                                if (!RedBlackNode<TKey, TValue>.IsRed(save[1-last]) && !RedBlackNode<TKey, TValue>.IsRed(save[last]))
                                 {
                                     // Смена цвета
-                                    save.Red = false;
-                                    save[LEFT].Red = true;
-                                    save[RIGHT].Red = true;
+                                    parent.Red = false;
+                                    save.Red = true;
+                                    cur.Red = true;
                                 }
                                 else
                                 {
                                     var sndDir = grandParent[RIGHT] == parent ? 1 : 0;
 
-                                    if (IsRed(save[last]))
+                                    if (RedBlackNode<TKey, TValue>.IsRed(save[last]))
                                         grandParent[sndDir] = parent.DoubleRotate(last);
-                                    else if (IsRed(save[1 - last]))
+                                    else if (RedBlackNode<TKey, TValue>.IsRed(save[1 - last]))
                                         grandParent[sndDir] = parent.SingleRotate(last);
 
                                     // Красим вершины в корректные цвета
@@ -234,7 +237,6 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
         public bool Contains(TKey key)
         {
             return FindNode(key) != null;
-        }
-        
+        }        
     }
 }

@@ -10,7 +10,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
     internal class RedBlackNode<TKey, TValue>
     {
         public const int LEFT = 0;
-        public const int RIGHT = 0;
+        public const int RIGHT = 1;
 
         private readonly RedBlackNode<TKey, TValue>[] _link;
 
@@ -33,6 +33,22 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                 if (dir != LEFT && dir != RIGHT)
                     throw new Exception("Некорректный индекс ребёнка");
                 _link[dir] = value;
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                var sum = 1;
+
+                if (this[LEFT] != null)
+                    sum += this[LEFT].Count;
+
+                if (this[RIGHT] != null)
+                    sum += this[RIGHT].Count;
+
+                return sum;
             }
         }
 
@@ -82,11 +98,11 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             var tmpValue = nodeA.Value;
             nodeA.Value = nodeB.Value;
             nodeB.Value = tmpValue;
-        }
+        }        
 
-        public override string ToString()
+        public static bool IsRed(RedBlackNode<TKey, TValue> node)
         {
-            return string.Format($"Ключ: {Key}, Значение {Value}, Красная: {Red}");
+            return node != null && node.Red;
         }
     }
 }
