@@ -1,4 +1,6 @@
-﻿namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
+﻿using System;
+
+namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 {
     /// <summary>
     /// Вспомогательный класс, представляющий собой вершину <see cref="RedBlackTree{TKey, TValue}"/>
@@ -7,149 +9,68 @@
     /// <typeparam name="TValue"></typeparam>
     internal class RedBlackNode<TKey, TValue>
     {
+        public const int LEFT = 0;
+        public const int RIGHT = 0;
+
+        private readonly RedBlackNode<TKey, TValue>[] _link;
+
         public TKey Key { get; set; }
 
         public TValue Value { get; set; }
 
-        public bool IsRed { get; set; }
+        public bool Red { get; set; }        
 
-        public RedBlackNode<TKey, TValue> Parent { get; set; }
-
-        public RedBlackNode<TKey, TValue> Left { get; set; }
-
-        public RedBlackNode<TKey, TValue> Right { get; set; }
-
-        public RedBlackNode<TKey, TValue> GrandParent
+        public RedBlackNode<TKey, TValue> this[int dir]
         {
             get
             {
-                if (Parent != null)
-                    return Parent.Parent;
-
-                return null;
+                if (dir != LEFT && dir != RIGHT)
+                    throw new Exception("Некорректный индекс ребёнка");
+                return _link[dir];
             }
-        }
-
-        public RedBlackNode<TKey, TValue> Brother
-        {
-            get
+            set
             {
-                if (Parent == null)
-                    return null;
-
-                return this == Parent.Left ? Parent.Right : Parent.Left;
+                if (dir != LEFT && dir != RIGHT)
+                    throw new Exception("Некорректный индекс ребёнка");
+                _link[dir] = value;
             }
         }
 
-        public RedBlackNode<TKey, TValue> Uncle
+        public RedBlackNode()
         {
-            get
-            {
-                var grandParent = GrandParent;
-
-                if (grandParent == null)
-                    return null;
-
-                if (Parent == grandParent.Left)
-                    return grandParent.Right;
-                else
-                    return grandParent.Left;
-            }
-        }
-
-        public bool HasNoChildren => Left == null && Right == null;
-
-        public bool HasOnlyLeftChild => Left != null && Right == null;
-
-        public bool HasOnlyRightChild => Left == null && Right != null;
-
-        public bool HasBothChildren => Left != null && Right != null;
-
-        public RedBlackNode<TKey, TValue> Pref
-        {
-            get
-            {
-                if (Left == null)
-                    return Parent;
-
-                return Left.FindMaxDescendant();
-            }
-        }
-
-        public RedBlackNode<TKey, TValue> Next
-        {
-            get
-            {
-                if (Right == null)
-                    return Parent;
-
-                return Right.FindMinDescendant();
-            }
-        }
-
-        private RedBlackNode<TKey, TValue> FindMinDescendant()
-        {
-            if (Left != null)
-                return Left.FindMinDescendant();
-            return this;
-        }
-
-        private RedBlackNode<TKey, TValue> FindMaxDescendant()
-        {
-            if (Right != null)
-                return Right.FindMaxDescendant();
-            return this;
+            Key = default;
+            Value = default;
+            Red = true;
+            _link = new RedBlackNode<TKey, TValue>[2];
         }
 
         public RedBlackNode(TKey key, TValue value)
         {
             Key = key;
             Value = value;
-            IsRed = true;
-            Left = null;
-            Right = null;
+            Red = true;
+            _link = new RedBlackNode<TKey, TValue>[2];
         }
 
-        public void LeftRotate()
+        public RedBlackNode<TKey, TValue> SingleRotate(int dir)
         {
-            var pivot = Right;
+            if (dir != LEFT && dir != RIGHT)
+                throw new Exception("Некорректное направление поворота");
 
-            pivot.Parent = Parent;
-            if (Parent == null)
-            {
-                if (Parent.Left == this)
-                    Parent.Left = pivot;
-                else
-                    Parent.Right = pivot;
-            }
+            var save = this[1 - dir];
+            this[1 - dir] = save[dir];
+            save[dir] = this;
 
-            Right = pivot.Left;
-            if (pivot.Left != null)
-                pivot.Left.Parent = this;
+            Red = true;
+            save.Red = false;
 
-            Parent = pivot;
-            pivot.Left = this;
+            return save;
         }
 
-        public void RightRotate()
+        public RedBlackNode<TKey, TValue> DoubleRotate(int dir)
         {
-            var pivot = Left;
-
-            pivot.Parent = Parent;
-            if (Parent == null)
-            {
-                if (Parent.Left == this)
-                    Parent.Left = pivot;
-                else
-                    Parent.Right = pivot;
-            }
-
-            Left = pivot.Right;
-            if (pivot.Right != null)
-                pivot.Right.Parent = this;
-
-            Parent = pivot;
-            pivot.Right = this;
+            this[1 - dir] = this[1 - dir].SingleRotate(1 - dir);
+            return SingleRotate(dir);
         }
 
         public static void Swap(RedBlackNode<TKey, TValue> nodeA, RedBlackNode<TKey, TValue> nodeB)
@@ -161,6 +82,11 @@
             var tmpValue = nodeA.Value;
             nodeA.Value = nodeB.Value;
             nodeB.Value = tmpValue;
+        }
+
+        public override string ToString()
+        {
+            return string.Format($"Ключ: {Key}, Значение {Value}, Красная: {Red}");
         }
     }
 }

@@ -47,7 +47,6 @@
     <Compile Include="CollisionDetection\BroadPhase\BroadPhaseManager.cs" />
     <Compile Include="CollisionDetection\BroadPhase\AABB.cs" />
     <Compile Include="CollisionDetection\BroadPhase\DataStructures\QuadTree.cs" />
-    <Compile Include="CollisionDetection\NarrowPhase\DataStructures\NodesInspector.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackNode.cs" />
     <Compile Include="Common\DefaultVectorComparator.cs" />
     <Compile Include="CollisionDetection\BroadPhase\IBoxable.cs" />

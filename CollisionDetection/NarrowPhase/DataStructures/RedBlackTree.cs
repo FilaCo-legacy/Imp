@@ -8,46 +8,57 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 {
     internal class RedBlackTree<TKey, TValue>
     {
-        private NodesInspector<TKey, TValue> _inspector;
+        private const int LEFT = 0;
+        private const int RIGHT = 1;
 
         private IComparer<TKey> _comparer;
 
         private RedBlackNode<TKey, TValue> _root;
 
-        public int Count
+        public bool Empty => _root == null;
+
+        public TValue this[TKey key]
         {
             get
             {
-                if (_root != null)
-                    return _root.Count;
+                var node = FindNode(key);
 
-                return 0;
+                if (node == null)
+                    throw new Exception("Элемента с таким ключом не было в дереве");
+
+                return node.Value;
+            }
+            set
+            {
+                var node = FindNode(key);
+
+                if (node == null)
+                    Insert(key, value);
+                else
+                    node.Value = value;
             }
         }
 
-        private RedBlackNode<TKey, TValue> FindNode(TKey key)
+        private static bool IsRed(RedBlackNode<TKey, TValue> node)
+        {
+            return node != null && node.Red;
+        }
+
+        private RedBlackNode<TKey, TValue> FindNode (TKey key)
         {
             var cur = _root;
-            parent = null;
-            grandParent = null;
-
-            if (cur == null)
-                return null;            
 
             while (cur != null)
             {
-                grandParent = parent;
-                parent = cur;
-
                 switch (_comparer.Compare(key, cur.Key))
                 {
                     case 0:
                         return cur;
-                    case 1:
-                        cur = cur.Right;
-                        break;
                     case -1:
-                        cur = cur.Left;
+                        cur = cur[LEFT];
+                        break;
+                    case 1:
+                        cur = cur[RIGHT];
                         break;
                 }
             }
@@ -55,102 +66,175 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             return null;
         }
 
-        private RedBlackNode<TKey, TValue> FindNode(TKey key)
+        public RedBlackTree()
         {
-            RedBlackNode<TKey, TValue> parent, grandParent;
-
-            var cur = FindNode(key, out parent, out grandParent);
-
-            return cur;
-        }        
-
-        public void Insert(TKey key, TValue value)
-        {
-            if (_root == null)
-            {
-                _root = new RedBlackNode<TKey, TValue>(key, value);
-                _inspector.FixAfterInsert(_root, null, null);
-                return;
-            }
-
-            RedBlackNode<TKey, TValue> parent, grandParent;
-            var cur = FindNode(key, out parent, out grandParent);
-
-            if (cur != null)
-                return;
-
-            cur = new RedBlackNode<TKey, TValue>(key, value);
-            if (_comparer.Compare(key, parent.Key) == -1)
-                parent.Left = cur;
-            else
-                parent.Right = cur;
-
-            _inspector.FixAfterInsert(cur, parent, grandParent);
+            _root = null;
+            _comparer = Comparer<TKey>.Default;
         }
 
-        public void Erase (TKey key)
+        public RedBlackTree(IComparer<TKey> comparer)
         {
-            RedBlackNode<TKey, TValue> parent, grandParent;
-            var cur = FindNode(key, out parent, out grandParent);
-
-            if (cur == null)
-                return;
-
-            if (cur.HasNoChildren)
-            {
-                if (cur == _root)
-                   _root = null;
-                else
-                {
-                    if (parent.Left == cur)
-                        parent.Left = null;
-                    else
-                        parent.Right = null;
-                }
-            }
-
-            var ind = _comparer.Compare(cur.Key, parent.Key) == 1 ? 1 : 0;
-
-            if (cur.HasOnlyRightChild)
-                parent[ind] = cur.Right;
-            else if (cur.HasOnlyLeftChild)
-                parent[ind] = cur.Left;
+            _root = null;
+            _comparer = comparer;
+        }
+             
+        public void Insert(TKey key, TValue value)
+        {
+            // Если дерево пустое
+            if (Empty)
+                _root = new RedBlackNode<TKey, TValue>(key, value);
             else
             {
-                var nextNode = cur.Next;
-                RedBlackNode<TKey, TValue>.Swap(cur, nextNode);
-                Erase(nextNode.Key);
+                var head = new RedBlackNode<TKey, TValue>();
+
+                var tmpHead = head;
+                RedBlackNode<TKey, TValue> grandParent = null;
+                RedBlackNode<TKey, TValue> parent = null;
+
+                head[RIGHT] = _root;
+                var cur = head[RIGHT];                
+
+                var dir = LEFT;
+                var last = dir;
+
+                // Спускаемся вниз по дереву
+                while (true)
+                {
+                    if (cur == null)
+                    {
+                        // Добавляем вершину вниз
+                        cur = new RedBlackNode<TKey, TValue>(key, value);
+                        parent[dir] = cur;
+                    }
+                    else if (IsRed(cur[LEFT]) && IsRed(cur[RIGHT]))
+                    {
+                        // Смена цветов
+                        cur.Red = true;
+                        cur[LEFT].Red = false;
+                        cur[RIGHT].Red = false;
+                    }
+
+                    // Исправление "красного" нарушения
+                    if (IsRed(cur) && IsRed(parent))
+                    {
+                        var sndDir = tmpHead[RIGHT] == grandParent ? 1 : 0;
+
+                        if (cur == parent[last])
+                            tmpHead[sndDir] = grandParent.SingleRotate(1 - last);
+                        else
+                            tmpHead[sndDir] = grandParent.DoubleRotate(1 - last);
+
+                    }
+
+                    if (_comparer.Compare(cur.Key, key) == 0)
+                        break;
+
+                    last = dir;
+                    dir = _comparer.Compare(key, cur.Key) == -1 ? 1 : 0;
+
+                    if (grandParent != null)
+                        tmpHead = grandParent;
+                    grandParent = parent;
+                    parent = cur;
+                    cur = cur[dir];
+                }
+
+                _root = head[RIGHT];
             }
 
-            _inspector.FixAfterErase(cur, parent, grandParent);
+            _root.Red = false;
+        }
+
+        public void Erase(TKey key)
+        {
+            if (!Empty)
+            {
+                var head = new RedBlackNode<TKey, TValue>();
+
+                RedBlackNode<TKey, TValue> grandParent = null;
+                RedBlackNode<TKey, TValue> foundNode = null;
+                RedBlackNode<TKey, TValue> parent = null;
+
+                var cur = head;
+                cur[RIGHT] = _root;
+
+                var dir = RIGHT;
+
+                // Находим и спускаем красные узлы вниз
+                while (cur[dir] != null)
+                {
+                    var last = dir;
+
+                    // Обновляем ссылки
+                    grandParent = parent;
+                    parent = cur;
+                    cur = cur[dir];
+                    dir = _comparer.Compare(key, cur.Key) == -1 ? 1 : 0;
+
+                    // Сохраняем найденную вершину
+                    if (_comparer.Compare(key, cur.Key) == 0)
+                        foundNode = cur;
+
+                    // Толкаем красные вершины вниз
+                    if (!IsRed(cur) && !IsRed(cur[dir]))
+                    { 
+                        if (IsRed(cur[1 - dir]))
+                        {
+                            parent[last] = cur.SingleRotate(dir);
+                            parent = parent[last];
+                        }
+                        else
+                        {
+                            var save = parent[1 - last];
+
+                            if (save != null)
+                            {
+                                if (!IsRed(save[1-last]) && !IsRed(save[1 - last]))
+                                {
+                                    // Смена цвета
+                                    save.Red = false;
+                                    save[LEFT].Red = true;
+                                    save[RIGHT].Red = true;
+                                }
+                                else
+                                {
+                                    var sndDir = grandParent[RIGHT] == parent ? 1 : 0;
+
+                                    if (IsRed(save[last]))
+                                        grandParent[sndDir] = parent.DoubleRotate(last);
+                                    else if (IsRed(save[1 - last]))
+                                        grandParent[sndDir] = parent.SingleRotate(last);
+
+                                    // Красим вершины в корректные цвета
+                                    cur.Red = true;
+                                    grandParent[sndDir].Red = true;
+
+                                    grandParent[sndDir][LEFT].Red = false;
+                                    grandParent[sndDir][RIGHT].Red = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                // Замещаем и удаляем, если найден элемент
+                if (foundNode != null)
+                {
+                    RedBlackNode<TKey, TValue>.Swap(foundNode, cur);
+
+                    parent[cur == parent[RIGHT] ? 1 : 0] = cur[cur[LEFT] == null ? 1 : 0];
+                }
+
+                _root = head[RIGHT];
+
+                if (!Empty)
+                    _root.Red = false;
+            }
         }
 
         public bool Contains(TKey key)
         {
-            var cur = FindNode(key);
-
-            return cur != null;
+            return FindNode(key) != null;
         }
-
-        public TValue this[TKey key]
-        {
-            get
-            {
-                var res = FindNode(key);
-                if (res == null)
-                    throw new Exception("Элемент с таким ключом не был найден");
-
-                return res.Value;
-            }
-            set
-            {
-                var res = FindNode(key);
-
-                if (res == null)
-                    Insert(key, value);
-                else
-                    res.Value = value;
-            }
-        }
+        
     }
 }
