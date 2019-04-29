@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
+﻿namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 {
     /// <summary>
     /// Вспомогательный класс, представляющий собой вершину <see cref="RedBlackTree{TKey, TValue}"/>
@@ -13,7 +11,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
         public TValue Value { get; set; }
 
-        public bool Red { get; set; }
+        public bool IsRed { get; set; }
 
         public RedBlackNode<TKey, TValue> Parent { get; set; }
 
@@ -32,6 +30,17 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             }
         }
 
+        public RedBlackNode<TKey, TValue> Brother
+        {
+            get
+            {
+                if (Parent == null)
+                    return null;
+
+                return this == Parent.Left ? Parent.Right : Parent.Left;
+            }
+        }
+
         public RedBlackNode<TKey, TValue> Uncle
         {
             get
@@ -45,22 +54,6 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
                     return grandParent.Right;
                 else
                     return grandParent.Left;
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                var res = 1;
-
-                if (Left != null)
-                    res += Left.Count;
-
-                if (Right != null)
-                    res += Right.Count;
-
-                return res;
             }
         }
 
@@ -94,33 +87,6 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             }
         }
 
-        /// <summary>
-        /// Представляет доступ к детям по индексу
-        /// </summary>
-        /// <param name="dir">Индекс ребёнка</param>
-        /// <returns>Если dir == 0, то возвращает левого ребёнка, иначе если dir == 1, то правого</returns>
-        public RedBlackNode<TKey, TValue> this[int dir]
-        {
-            get
-            {
-                if (dir == 0)
-                    return Left;
-                else if (dir == 1)
-                    return Right;
-
-                throw new Exception("Некорректный индекс ребёнка подан на вход");
-            }
-            set
-            {
-                if (dir == 0)
-                    Left = value;
-                else if (dir == 1)
-                    Right = value;
-
-                throw new Exception("Некорректный индекс ребёнка подан на вход");
-            }
-        }
-
         private RedBlackNode<TKey, TValue> FindMinDescendant()
         {
             if (Left != null)
@@ -139,42 +105,51 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
         {
             Key = key;
             Value = value;
-            Red = true;
+            IsRed = true;
             Left = null;
             Right = null;
         }
 
-        /// <summary>
-        /// Одинарный поворот вершины дерева в заданном направлении
-        /// </summary>
-        /// <param name="dir">Направление вращения</param>
-        /// <returns>Возвращает вершину, оказавшуюся на заданной позиции</returns>
-        public RedBlackNode<TKey, TValue> SingleRotate(int dir)
+        public void LeftRotate()
         {
-            var save = this[1 - dir];
+            var pivot = Right;
 
-            if (save == null)
-                throw new Exception("Вершина не имела нужного для поворота сына");
+            pivot.Parent = Parent;
+            if (Parent == null)
+            {
+                if (Parent.Left == this)
+                    Parent.Left = pivot;
+                else
+                    Parent.Right = pivot;
+            }
 
-            this[1 - dir] = save[dir];
-            save[dir] = this;
+            Right = pivot.Left;
+            if (pivot.Left != null)
+                pivot.Left.Parent = this;
 
-            Red = true;
-            save.Red = false;
-
-            return save;
+            Parent = pivot;
+            pivot.Left = this;
         }
 
-        /// <summary>
-        /// Двойной поворот вершины дерева в заданном направлении
-        /// </summary>
-        /// <param name="dir">Направление вращения</param>
-        /// <returns></returns>
-        public RedBlackNode<TKey, TValue> DoubleRotate(int dir)
+        public void RightRotate()
         {
-            this[1 - dir] = this[1 - dir].SingleRotate(1 - dir);
+            var pivot = Left;
 
-            return SingleRotate(dir);
+            pivot.Parent = Parent;
+            if (Parent == null)
+            {
+                if (Parent.Left == this)
+                    Parent.Left = pivot;
+                else
+                    Parent.Right = pivot;
+            }
+
+            Left = pivot.Right;
+            if (pivot.Right != null)
+                pivot.Right.Parent = this;
+
+            Parent = pivot;
+            pivot.Right = this;
         }
 
         public static void Swap(RedBlackNode<TKey, TValue> nodeA, RedBlackNode<TKey, TValue> nodeB)
@@ -186,11 +161,6 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
             var tmpValue = nodeA.Value;
             nodeA.Value = nodeB.Value;
             nodeB.Value = tmpValue;
-        }
-
-        public static bool IsRed(RedBlackNode<TKey, TValue> node)
-        {
-            return node != null && node.Red;
         }
     }
 }
