@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 namespace PhysEngine.Common
 {
     /// <summary>
+    /// Делегат, определяющий должны ли сталкиваться два объекта с помощью их масок и номеров групп
+    /// </summary>
+    /// <param name="firstObject"></param>
+    /// <param name="secondObject"></param>
+    /// <returns></returns>
+    public delegate bool MaskFilter(IMask firstObject, IMask secondObject);
+
+    /// <summary>
     /// Сборник констант для физического движка
     /// </summary>
     public static class PhysEngineDefaults
@@ -26,7 +34,7 @@ namespace PhysEngine.Common
         /// </summary>
         public const float G = 9.8f;
 
-        public static bool ShouldCollide(IPhysObject physObjA, IPhysObject physObjB)
+        public static bool ShouldCollide(IMask physObjA, IMask physObjB)
         {
             // Если индекс группы хотя бы одного из объектов равна 0 или индексы групп не равны
             if (physObjA.GroupIndex == 0 || physObjB.GroupIndex == 0 || Math.Abs(physObjA.GroupIndex) !=

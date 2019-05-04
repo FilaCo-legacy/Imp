@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PhysEngine.CollisionDetection.BroadPhase;
 
-namespace PhysEngine.Common
+namespace PhysEngine.CollisionDetection.BroadPhase
 {
-    public interface IPhysObject
+    public interface IMask
     {
         ushort Mask { get; set; }
 

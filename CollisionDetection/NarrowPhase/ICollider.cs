@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PhysEngine.CollisionDetection.NarrowPhase.DataStructures;
+using PhysEngine.Common;
 
 namespace PhysEngine.CollisionDetection.NarrowPhase
 {
-    internal class NarrowPhaseManager
+    public interface ICollider
     {
-        private readonly RedBlackTree<int, int> _dictionaryPairs;
-
-
+        Phys
     }
 }

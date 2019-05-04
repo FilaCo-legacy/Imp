@@ -47,11 +47,13 @@
     <Compile Include="CollisionDetection\BroadPhase\BroadPhaseManager.cs" />
     <Compile Include="CollisionDetection\BroadPhase\AABB.cs" />
     <Compile Include="CollisionDetection\BroadPhase\DataStructures\QuadTree.cs" />
+    <Compile Include="CollisionDetection\BroadPhase\IMask.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackNode.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\ICollider.cs" />
     <Compile Include="Common\DefaultVectorComparator.cs" />
     <Compile Include="CollisionDetection\BroadPhase\IBoxable.cs" />
     <Compile Include="Common\PhysEngineDefaults.cs" />
-    <Compile Include="Common\IPhysObject.cs" />
+    <Compile Include="Common\PhysObject.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\NarrowPhaseManager.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackTree.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\Shapes\PolygonSetter.cs" />
