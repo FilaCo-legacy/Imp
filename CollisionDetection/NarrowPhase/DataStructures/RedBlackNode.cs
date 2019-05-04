@@ -54,8 +54,8 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.DataStructures
 
         public RedBlackNode()
         {
-            Key = default;
-            Value = default;
+            Key = default(TKey);
+            Value = default(TValue);
             Red = true;
             _link = new RedBlackNode<TKey, TValue>[2];
         }

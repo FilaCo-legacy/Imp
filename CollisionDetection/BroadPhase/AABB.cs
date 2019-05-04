@@ -1,4 +1,6 @@
-﻿namespace PhysEngine.CollisionDetection.BroadPhase
+﻿using PhysEngine.Common;
+
+namespace PhysEngine.CollisionDetection.BroadPhase
 {
     /// <summary>
     /// Структура, представляющая собой прямоугольник, выровненный по осям координат (Axis-Aligned Bounding Box)

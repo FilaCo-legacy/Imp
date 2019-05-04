@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace PhysEngine.CollisionDetection.BroadPhase.DataStructures
+namespace PhysEngine.CollisionDetection.BroadPhase
 {
     /// <summary>
     /// Структура данных "Дерево квадрантов"
     /// </summary>
-    public class QuadTree <T> where T:IBoxable
+    internal class QuadTree <T> where T:IBoxable
     {
         public const int MAX_OBJECTS = 10;
         public const int MAX_LEVELS = 5;

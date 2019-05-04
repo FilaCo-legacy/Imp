@@ -46,8 +46,8 @@
   <ItemGroup>
     <Compile Include="CollisionDetection\BroadPhase\BroadPhaseManager.cs" />
     <Compile Include="CollisionDetection\BroadPhase\AABB.cs" />
-    <Compile Include="CollisionDetection\BroadPhase\DataStructures\QuadTree.cs" />
     <Compile Include="CollisionDetection\BroadPhase\IMask.cs" />
+    <Compile Include="CollisionDetection\BroadPhase\QuadTree.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackNode.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\ICollider.cs" />
     <Compile Include="Common\DefaultVectorComparator.cs" />
@@ -65,6 +65,5 @@
     <Compile Include="Common\Vector.cs" />
     <Compile Include="Scene.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

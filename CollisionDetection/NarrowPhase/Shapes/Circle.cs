@@ -1,5 +1,6 @@
 ﻿using System;
 using PhysEngine.CollisionDetection.BroadPhase;
+using PhysEngine.Common;
 
 namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
 {
@@ -29,20 +30,30 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
         /// </summary>
         /// <returns></returns>
         public Circle(Circle ancestor)
-        {
-            this.Radius = ancestor.Radius;
+        { 
+            Radius = ancestor.Radius;
         }
 
-        float IShape.CalculateArea()
+        public float CalculateArea()
         {
             if (Radius < 0)
                 throw new Exception("The radius has negative value");
             return (float)Math.PI * Radius * Radius;
         }
 
-        AABB IShape.GetBox()
+        public AABB GetBox()
         {
             return new AABB(0, 0, Radius, Radius);
+        }
+
+        public float ComputeMass(float density)
+        {
+            return CalculateArea() * density;
+        }
+
+        public float ComputeInertia(float mass)
+        {
+            return mass * Radius * Radius;
         }
     }
 }

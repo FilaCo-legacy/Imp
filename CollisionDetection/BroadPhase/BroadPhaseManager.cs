@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PhysEngine.CollisionDetection.BroadPhase.DataStructures;
 
 namespace PhysEngine.CollisionDetection.BroadPhase
 {
@@ -11,7 +10,7 @@ namespace PhysEngine.CollisionDetection.BroadPhase
         private QuadTree<T> _quadTree;
 
         /// <summary>
-        /// Инициализирует объект <see cref="BroadPhaseManager{T}"/> с заданными размерностями
+        /// Инициализирует объект <see cref="BroadPhaseManager{T}"/> с заданными размерами
         /// </summary>
         /// <param name="sceneWidth"></param>
         /// <param name="sceneHeight"></param>
