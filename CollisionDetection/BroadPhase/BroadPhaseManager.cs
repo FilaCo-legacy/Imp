@@ -20,6 +20,20 @@ namespace PhysEngine.CollisionDetection.BroadPhase
             _quadTree = new QuadTree<T>(0, new AABB(0, 0, sceneWidth, sceneHeight));
         }
 
+        private static void FilterIntersectBoxes(T physObject, List<T> candidates)
+        {
+            var tmp = new List<T>();
+
+            foreach (var curObject in candidates)
+            {
+                if (AABB.AreCollided(physObject.GetBox, curObject.GetBox))
+                    tmp.Add(curObject);
+            }
+            
+            candidates.Clear();
+            candidates.AddRange(tmp);
+        }
+
         /// <summary>
         /// Adds objects-actors of current step
         /// </summary>
@@ -40,6 +54,7 @@ namespace PhysEngine.CollisionDetection.BroadPhase
             var candidates = new List<T>();
 
             _quadTree.Retrieve(candidates, physObject);
+            FilterIntersectBoxes(physObject, candidates);
 
             return candidates;
         }
