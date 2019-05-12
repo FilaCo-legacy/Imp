@@ -3,32 +3,38 @@
 namespace PhysEngine.CollisionDetection.BroadPhase
 {
     /// <summary>
-    /// Класс, отвечающий за "Широкую фазу" разрешения коллизий.
+    /// Fast-checker to find objects that can collide during current step.
+    /// Physics objects are instantiated as their boxes, which covers their shapes.
     /// </summary>
     internal class BroadPhaseManager <T> where T: IBoxable
     {
-        private QuadTree<T> _quadTree;
+        private readonly QuadTree<T> _quadTree;
 
         /// <summary>
-        /// Инициализирует объект <see cref="BroadPhaseManager{T}"/> с заданными размерами
+        /// Initialize an object of <see cref="BroadPhaseManager{T}"/> with given dimensions
         /// </summary>
-        /// <param name="sceneWidth"></param>
-        /// <param name="sceneHeight"></param>
-        BroadPhaseManager(int sceneWidth, int sceneHeight)
+        /// <param name="sceneWidth">Width of the scene, which this manager is connected with</param>
+        /// <param name="sceneHeight">Height of the scene, which this manager is connected with</param>
+        internal BroadPhaseManager(int sceneWidth, int sceneHeight)
         {
             _quadTree = new QuadTree<T>(0, new AABB(0, 0, sceneWidth, sceneHeight));
         }
 
         /// <summary>
-        /// Добавляет все объекты в дерево квандрантов для последующего анализа
+        /// Adds objects-actors of current step
         /// </summary>
         /// <param name="objects"></param>
-        public void Initialize(List<T> objects)
+        public void Initialize(IEnumerable<T> objects)
         {
             foreach (var curObject in objects)
                 _quadTree.Insert(curObject);
         }
 
+        /// <summary>
+        /// Returns objects that might be collided with given 
+        /// </summary>
+        /// <param name="physObject"></param>
+        /// <returns></returns>
         public List<T> GetCandidates(T physObject)
         {
             var candidates = new List<T>();
@@ -38,6 +44,9 @@ namespace PhysEngine.CollisionDetection.BroadPhase
             return candidates;
         }
 
+        /// <summary>
+        /// Clears the list of the objects
+        /// </summary>
         public void Clear()
         {
             _quadTree.Clear();

@@ -3,35 +3,43 @@
 namespace PhysEngine.CollisionDetection.BroadPhase
 {
     /// <summary>
-    /// Структура данных "Дерево квадрантов"
+    /// Data structure "Quadrant tree": https://en.wikipedia.org/wiki/Quadtree
     /// </summary>
     internal class QuadTree <T> where T:IBoxable
     {
-        public const int MAX_OBJECTS = 10;
-        public const int MAX_LEVELS = 5;
-
         /// <summary>
-        /// Уровень вершины. 0 - самый верхний уровень
+        /// Maximum number of objects that might be located in one node
         /// </summary>
-        private int _level;
-
+        public const int MaxObjects = 10;
+        
         /// <summary>
-        /// Объекты, находящиеся в данной вершине
+        /// Maximum levels that can be created
         /// </summary>
-        private List<T> _objects;
+        public const int MaxLevels = 5;
 
         /// <summary>
-        /// Границы данной вершины на внешней карте
+        /// Level of this <see cref="QuadTree{T}"/> node.
+        /// 0 - the highest level
         /// </summary>
-        private AABB _bounds;
+        private readonly int _level;
 
         /// <summary>
-        /// Дочерние узлы дерева
+        /// Objects that are located in this <see cref="QuadTree{T}"/> node
         /// </summary>
-        private QuadTree<T>[] _nodes;
+        private readonly List<T> _objects;
 
         /// <summary>
-        /// Разделение узла дерева и определение его четырёх потомков
+        /// Bounds of this <see cref="QuadTree{T}"/> node
+        /// </summary>
+        private readonly AABB _bounds;
+
+        /// <summary>
+        /// Children nodes
+        /// </summary>
+        private readonly QuadTree<T>[] _nodes;
+
+        /// <summary>
+        /// Splits current <see cref="QuadTree{T}"/> node and creates children of it
         /// </summary>
         private void Split()
         {
@@ -49,7 +57,7 @@ namespace PhysEngine.CollisionDetection.BroadPhase
 
         private bool IsInTopQuadrants(AABB rectangle)
         {
-            return (rectangle.LeftUpper.Y < _bounds.Center.Y) && (rectangle.LeftUpper.Y + rectangle.Height < _bounds.Center.Y);
+            return rectangle.LeftUpper.Y < _bounds.Center.Y && (rectangle.LeftUpper.Y + rectangle.Height < _bounds.Center.Y);
         }
 
         private bool IsInBottomQuadrants(AABB rectangle)
@@ -59,7 +67,7 @@ namespace PhysEngine.CollisionDetection.BroadPhase
 
         private bool IsInLeftQuadrants(AABB rectangle)
         {
-            return (rectangle.LeftUpper.X < _bounds.Center.X) && (rectangle.LeftUpper.X + rectangle.Width < _bounds.Center.X);
+            return rectangle.LeftUpper.X < _bounds.Center.X && (rectangle.LeftUpper.X + rectangle.Width < _bounds.Center.X);
         }
 
         private bool IsInRightQuadrants(AABB rectangle)
@@ -68,10 +76,11 @@ namespace PhysEngine.CollisionDetection.BroadPhase
         }
 
         /// <summary>
-        /// Получает индекс дочернего узла, в котором полностью находится указанный объект
+        /// Gets index of a child node, where the <see cref="AABB"/> is located
         /// </summary>
-        /// <param name="rectangle">Объект, месторасположение которого выясняется</param>
-        /// <returns>Возвращает -1, если объект лежит хотя бы на двух квадрантах, иначе возвращает индекс четверти</returns>
+        /// <param name="rectangle"></param>
+        /// <returns>Returns "-1", if the <see cref="AABB"/> is located at least in two quads,
+        /// else returns the quad index</returns>
         private int GetIndex(AABB rectangle)
         {
             var index = -1;
@@ -132,7 +141,7 @@ namespace PhysEngine.CollisionDetection.BroadPhase
         }
 
         /// <summary>
-        /// Помещает новый объект в дерево
+        /// Puts a new object in the <see cref="QuadTree{T}"/>
         /// </summary>
         /// <param name="obj"></param>
         public void Insert(T obj)
@@ -142,7 +151,7 @@ namespace PhysEngine.CollisionDetection.BroadPhase
 
             _objects.Add(obj);
 
-            if (_objects.Count > MAX_OBJECTS && _level < MAX_LEVELS)
+            if (_objects.Count > MaxObjects && _level < MaxLevels)
             {
                 if (!(_nodes[0] is null))
                     Split();
@@ -159,10 +168,10 @@ namespace PhysEngine.CollisionDetection.BroadPhase
         }
 
         /// <summary>
-        /// Определяет, какие объекты возможно пересекаются с данным
+        /// Finds objects that are possible to collide with given
         /// </summary>
-        /// <param name="targetObj">Проверяемый объект</param>
-        /// <param name="candidates">Список кандидатов на пересечение</param>
+        /// <param name="targetObj">Target object</param>
+        /// <param name="candidates">List of neighbours</param>
         public void Retrieve(List<T> candidates, T targetObj)
         {
             var index = GetIndex(targetObj.GetBox);
