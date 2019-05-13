@@ -1,78 +1,53 @@
 ﻿using System;
+using PhysEngine.Common;
 using PhysEngine.CollisionDetection.BroadPhase;
 
 namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
 {
     /// <summary>
-    /// Структура, представляющая форму тела "полигон"
+    /// Structure that implements the polygon shape
     /// </summary>
-    public struct Polygon : IShape
+    public partial struct Polygon : IShape
     {
-        /// <summary>
-        /// Максимальное кол-во вершин в полигоне
-        /// </summary>
-        public const int MAX_COUNT_VERTICES = 16;
+        public const int MaxCountVertices = 16;
         
         /// <summary>
-        /// Количество вершин в полигоне
+        /// Number of vertices in the polygon
         /// </summary>
         public int VerticesCount => Vertices.Length;
-
-        /// <summary>
-        /// Матрица поворота полигона
-        /// </summary>
+        
         public Mat22 MatrixOrient { get; set; }
 
         /// <summary>
-        /// Массив нормалей к рёбрам
+        /// Array of normals to the edges
         /// </summary>
         public Vector[] Normals { get; }
-
-        /// <summary>
-        /// Массив вершин полигона
-        /// </summary>
+        
         public Vector[] Vertices { get; }
 
         /// <summary>
-        /// Инициализирует новый объект формы <see cref="Polygon"/> на основе уже существующей
+        /// Initialize new object of <see cref="Polygon"/> from the array of vertices
         /// </summary>
-        /// <param name="ancestor">Форма, копия которой будет создана</param>
-        public Polygon(Polygon ancestor)
-        {
-            this.Vertices = new Vector[ancestor.VerticesCount];
-            this.Normals = new Vector[ancestor.VerticesCount];
-            this.MatrixOrient = new Mat22(ancestor.MatrixOrient);
-            for (int i = 0; i < Vertices.Length; ++i)
-            {
-                Vertices[i] = ancestor.Vertices[i];
-                Normals[i] = ancestor.Normals[i];
-            }
-        }
-
-        /// <summary>
-        /// Инициализирует новый объект формы <see cref="Polygon"/> на основе массива вершин
-        /// </summary>
-        /// <param name="vertices">Массив вершин полигона</param>
+        /// <param name="vertices"></param>
         public Polygon(Vector[] vertices)
         {
-            if (vertices.Length < 3 || vertices.Length > MAX_COUNT_VERTICES)
+            if (vertices.Length < 3 || vertices.Length > MaxCountVertices)
                 throw new Exception("The incorrect number of vertices was given");
 
             MatrixOrient = new Mat22(0);
 
             var polygonSetter = new PolygonSetter(vertices);
-            Vector[] tmpVertices, tmpNormals;
-            polygonSetter.SetPolygon(out tmpVertices, out tmpNormals);
+            polygonSetter.SetPolygon(out var tmpVertices, out var tmpNormals);
 
             Vertices = tmpVertices;
             Normals = tmpNormals;
         }
 
         /// <summary>
-        /// Инициализирует новый полигон в форме прямоугольника с заданной высотой и шириной
+        /// Initialize new object of <see cref="Polygon"/> shaped as a rectangle with given width and height
         /// </summary>
-        /// <param name="width">Ширина прямоугольника</param>
-        /// <param name="height">Высота прямоугольника</param>
+        /// <param name="width">Width of the rectangle</param>
+        /// <param name="height">Height of the rectangle</param>
         public Polygon(float width, float height)
         {
             if (width <= 0)
@@ -95,19 +70,16 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
             Normals[2].Set(0.0f, 1.0f);
             Normals[3].Set(-1.0f, 0.0f);
         }
-
-        /// <summary>
-        /// Поворот фигуры
-        /// </summary>
+        
         public void SetOrient(float angle)
         {
             MatrixOrient.Set(angle);
         }
 
         /// <summary>
-        /// Получает самую дальнюю вершину полигона в заданном направлении
+        /// Gets the most far vertex of the polygon in the given direction
         /// </summary>
-        /// <param name="direction">Вектор направления</param>
+        /// <param name="direction">Vector of the direction</param>
         /// <returns></returns>
         public Vector GetSupport(Vector direction)
         {
@@ -126,7 +98,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
             return bestVertex;
         }
 
-        float IShape.CalculateArea()
+        public float CalculateArea()
         {
             var area = 0.0f;
 
@@ -142,7 +114,7 @@ namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
             return area / 2.0f;
         }
 
-        AABB IShape.GetBox()
+        public AABB GetBox()
         {
             var leftUpper = Vertices[0];
             var rightLower = Vertices[0];

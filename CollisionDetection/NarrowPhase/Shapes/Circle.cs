@@ -5,33 +5,21 @@ using PhysEngine.Common;
 namespace PhysEngine.CollisionDetection.NarrowPhase.Shapes
 {
     /// <summary>
-    /// Представляет собой окружность
+    /// Structure that implements the circle shape
     /// </summary>
     public struct Circle: IShape
     {
-        /// <summary>
-        /// Радиус окружности
-        /// </summary>
         public float Radius { get; }
 
         /// <summary>
-        /// Инициализирует объект структуры <see cref="Circle"/>
+        /// Initialize the object of <see cref="Circle"/> with given radius
         /// </summary>
-        /// <param name="radius">Радиус новой окружности</param>
+        /// <param name="radius">The radius of a new circle</param>
         public Circle(float radius)
         {
             if (radius < 0)
                 throw new Exception("The radius has negative value");
             Radius = radius;
-        }
-
-        /// <summary>
-        /// Инициализирует новый объект формы <see cref="Circle"/> с тем же радиусом
-        /// </summary>
-        /// <returns></returns>
-        public Circle(Circle ancestor)
-        { 
-            Radius = ancestor.Radius;
         }
 
         public float CalculateArea()

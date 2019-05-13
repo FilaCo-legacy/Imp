@@ -50,6 +50,7 @@
     <Compile Include="CollisionDetection\BroadPhase\QuadTree.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\DataStructures\RedBlackNode.cs" />
     <Compile Include="CollisionDetection\NarrowPhase\ICollider.cs" />
+    <Compile Include="CollisionDetection\NarrowPhase\Shapes\PolygonMassComputation.cs" />
     <Compile Include="Common\DefaultVectorComparator.cs" />
     <Compile Include="CollisionDetection\BroadPhase\IBoxable.cs" />
     <Compile Include="Common\PhysEngineDefaults.cs" />
