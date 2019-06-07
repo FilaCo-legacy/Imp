@@ -1,8 +1,9 @@
 using System;
-using ImpLite.Bodies;
-using ImpLite.BroadPhase;
+using System.Numerics;
+using Imp.Bodies;
+using Imp.BroadPhase;
 
-namespace ImpLite.NarrowPhase.Solvers
+namespace Imp.NarrowPhase.Solvers
 {
     /// <summary>
     /// An implementation of method that solves collision between two body shaped by<see cref="Box"/>
@@ -33,7 +34,7 @@ namespace ImpLite.NarrowPhase.Solvers
             var halfWidthA = _boxA.Width / 2.0f;
             var halfWidthB = _boxB.Width / 2.0f;
 
-            return halfWidthA + halfWidthB - Math.Abs(_normal.X);
+            return halfWidthA + halfWidthB - System.Math.Abs(_normal.X);
         }
         
         private float ComputeOverlapY()
@@ -41,7 +42,7 @@ namespace ImpLite.NarrowPhase.Solvers
             var halfHeightA = _boxA.Height / 2.0f;
             var halfHeightB = _boxB.Height / 2.0f;
 
-            return halfHeightA + halfHeightB - Math.Abs(_normal.Y);
+            return halfHeightA + halfHeightB - System.Math.Abs(_normal.Y);
         }
 
         public void ResolveCollision(Collider collider)
@@ -62,7 +63,7 @@ namespace ImpLite.NarrowPhase.Solvers
                 collider.Normal = _normal.Y < 0 ? new Vector2(0.0f, -1.0f) : new Vector2(0.0f, 1.0f);
             }
 
-            collider.Penetration = Math.Min(xOverlap, yOverlap);
+            collider.Penetration = System.Math.Min(xOverlap, yOverlap);
         }
     }
 }

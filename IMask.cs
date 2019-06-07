@@ -1,4 +1,4 @@
-namespace ImpLite
+namespace Imp
 {
     /// <summary>
     /// Interface that describes a category which the object is related and defines categories that might collide with it

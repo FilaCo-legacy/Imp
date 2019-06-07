@@ -3,7 +3,7 @@
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
         <TargetFramework>netcoreapp2.2</TargetFramework>
-        <RootNamespace>ImpLite</RootNamespace>
+        <RootNamespace>Imp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

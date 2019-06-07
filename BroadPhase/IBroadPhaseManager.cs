@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ImpLite.BroadPhase
+namespace Imp.BroadPhase
 {
     /// <summary>
     /// Provides an interface for classes that are responsible for a broad-phase check

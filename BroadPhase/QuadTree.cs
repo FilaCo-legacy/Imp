@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ImpLite.BroadPhase
+namespace Imp.BroadPhase
 {
     /// <summary>
     /// Data structure "Quadrant tree": https://en.wikipedia.org/wiki/Quadtree

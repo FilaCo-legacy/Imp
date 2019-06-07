@@ -1,4 +1,6 @@
-namespace ImpLite
+using System.Numerics;
+
+namespace Imp
 {
     public delegate bool MaskFilter (IMask lhs, IMask rhs);
 

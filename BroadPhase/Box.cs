@@ -1,4 +1,6 @@
-﻿namespace ImpLite.BroadPhase
+﻿using System.Numerics;
+
+namespace Imp.BroadPhase
 {
     /// <summary>
     /// Axis-Aligned Bounding Box

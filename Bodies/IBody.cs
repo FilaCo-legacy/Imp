@@ -1,6 +1,7 @@
-using ImpLite.BroadPhase;
+using System.Numerics;
+using Imp.BroadPhase;
 
-namespace ImpLite.Bodies
+namespace Imp.Bodies
 {
     public interface IBody : IMask, IBoxable
     {

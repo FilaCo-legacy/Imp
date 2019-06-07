@@ -1,4 +1,4 @@
-﻿namespace ImpLite.BroadPhase
+﻿namespace Imp.BroadPhase
 {
     public interface IBoxable
     {

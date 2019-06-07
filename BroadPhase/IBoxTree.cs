@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ImpLite.BroadPhase
+namespace Imp.BroadPhase
 {
     public interface IBoxTree<T> where T : IBoxable
     {

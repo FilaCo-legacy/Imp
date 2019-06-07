@@ -1,4 +1,6 @@
-namespace ImpLite.Bodies
+using System.Numerics;
+
+namespace Imp.Bodies
 {
     /// <summary>
     /// Provides an interface to build some instance of <see cref="RigidBody"/>

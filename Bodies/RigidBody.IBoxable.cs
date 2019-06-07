@@ -1,6 +1,6 @@
-using ImpLite.BroadPhase;
+using Imp.BroadPhase;
 
-namespace ImpLite.Bodies
+namespace Imp.Bodies
 {
     public partial class RigidBody
     {

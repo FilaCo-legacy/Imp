@@ -1,6 +1,7 @@
-using ImpLite.BroadPhase;
+using System.Numerics;
+using Imp.BroadPhase;
 
-namespace ImpLite.Bodies
+namespace Imp.Bodies
 {
     /// <summary>
     /// Represents some body's model in the physics engine

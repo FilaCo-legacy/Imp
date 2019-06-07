@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace ImpLite.NarrowPhase
+namespace Imp.NarrowPhase
 {
     internal class HashTable <T> where T : IEquatable<T>
     {

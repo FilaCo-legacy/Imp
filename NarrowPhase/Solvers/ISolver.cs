@@ -1,4 +1,4 @@
-namespace ImpLite.NarrowPhase.Solvers
+namespace Imp.NarrowPhase.Solvers
 {
     public interface ISolver
     {

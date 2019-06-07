@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using ImpLite.Bodies;
-using ImpLite.BroadPhase;
-using ImpLite.NarrowPhase;
+using System.Numerics;
+using Imp.Bodies;
+using Imp.BroadPhase;
+using Imp.NarrowPhase;
 
-namespace ImpLite
+namespace Imp
 {
     public class World
     {
@@ -69,7 +70,7 @@ namespace ImpLite
         {
             foreach (var cur in  _bodies)
             {
-                cur.Force.Set(0.0f,0.0f);
+                cur.Force = Vector2.Zero;
             }
         }
 

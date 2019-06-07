@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using ImpLite.Bodies;
-using ImpLite.NarrowPhase.Solvers;
+using Imp.Bodies;
+using Imp.NarrowPhase.Solvers;
 
-namespace ImpLite.NarrowPhase
+namespace Imp.NarrowPhase
 {
     internal class NarrowPhaseManager<T> where T:ICollider
     {

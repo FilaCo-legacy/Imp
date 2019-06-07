@@ -1,8 +1,9 @@
 using System;
-using ImpLite.Bodies;
-using ImpLite.NarrowPhase.Solvers;
+using System.Numerics;
+using Imp.Bodies;
+using Imp.NarrowPhase.Solvers;
 
-namespace ImpLite.NarrowPhase
+namespace Imp.NarrowPhase
 {
     public class Collider : ICollider
     {
@@ -33,15 +34,15 @@ namespace ImpLite.NarrowPhase
 
         private void InfiniteMassCorrection()
         {
-            BodyA.LinearVelocity.Set(0.0f, 0.0f);
-            BodyB.LinearVelocity.Set(0.0f, 0.0f);
+            BodyA.LinearVelocity = Vector2.Zero;
+            BodyB.LinearVelocity = Vector2.Zero;
         }
 
         private Vector2 ComputeImpulse()
         {
             var relativeVelocity = BodyB.LinearVelocity - BodyA.LinearVelocity;
 
-            var contactVelocity = Vector2.DotProduct(relativeVelocity, Normal);
+            var contactVelocity = Vector2.Dot(relativeVelocity, Normal);
 
             var invMassSum = BodyA.InverseMass + BodyB.InverseMass;
 
@@ -59,17 +60,17 @@ namespace ImpLite.NarrowPhase
             var relativeVelocity = BodyB.LinearVelocity - BodyA.LinearVelocity;   
             var invMassSum = BodyA.InverseMass + BodyB.InverseMass;
             
-            var tangent = relativeVelocity - Normal * Vector2.DotProduct(Normal, relativeVelocity);
-            tangent.Normalize();
+            var tangent = relativeVelocity - Normal * Vector2.Dot(Normal, relativeVelocity);
+            tangent = Vector2.Normalize(tangent);
 
-            var absFrictionImpulse = -Vector2.DotProduct(relativeVelocity, tangent);
+            var absFrictionImpulse = -Vector2.Dot(relativeVelocity, tangent);
             absFrictionImpulse /= invMassSum;
             absFrictionImpulse /= ContactNumber;
 
-            if (Math.Abs(absFrictionImpulse) < ImpParams.GetInstance.Epsilon)
+            if (System.Math.Abs(absFrictionImpulse) < ImpParams.GetInstance.Epsilon)
                 return new Vector2(0, 0);
 
-            if (Math.Abs(absFrictionImpulse) < absImpulse * _mixedStaticFriction)
+            if (System.Math.Abs(absFrictionImpulse) < absImpulse * _mixedStaticFriction)
                 return tangent * absFrictionImpulse;
             else
                 return tangent * -absImpulse * _mixedDynamicFriction;
@@ -80,7 +81,7 @@ namespace ImpLite.NarrowPhase
             var percentage = ImpParams.GetInstance.PercentLinearProjection;
             var slop = ImpParams.GetInstance.Slop;
             
-            var correction = Math.Max(Penetration - slop, 0.0f) / 
+            var correction = System.Math.Max(Penetration - slop, 0.0f) / 
                                   (BodyA.InverseMass + BodyB.InverseMass) * percentage * Normal;
             BodyA.Position -= BodyA.InverseMass * correction;
             BodyB.Position += BodyB.InverseMass * correction;
@@ -90,10 +91,10 @@ namespace ImpLite.NarrowPhase
         {
             Solver.ResolveCollision(this);
             
-            _mixedRestitution= Math.Min(BodyA.Material.Restitution, BodyB.Material.Restitution);
+            _mixedRestitution= System.Math.Min(BodyA.Material.Restitution, BodyB.Material.Restitution);
             
-            _mixedStaticFriction = (float)Math.Sqrt(BodyA.Material.StaticFriction * BodyB.Material.StaticFriction);
-            _mixedDynamicFriction = (float)Math.Sqrt(BodyA.Material.DynamicFriction * BodyB.Material.DynamicFriction);
+            _mixedStaticFriction = (float)System.Math.Sqrt(BodyA.Material.StaticFriction * BodyB.Material.StaticFriction);
+            _mixedDynamicFriction = (float)System.Math.Sqrt(BodyA.Material.DynamicFriction * BodyB.Material.DynamicFriction);
 
             for (var i = 0; i < ContactNumber; ++i)
             {
@@ -103,7 +104,7 @@ namespace ImpLite.NarrowPhase
                 var gravity = ImpParams.GetInstance.Gravity;
                 var eps = ImpParams.GetInstance.Epsilon;
                 
-                if (relativeVelocity.LengthSquared < (timeStep * gravity).LengthSquared + eps)
+                if (relativeVelocity.LengthSquared() < (timeStep * gravity).LengthSquared() + eps)
                     _mixedRestitution = 0.0f;
             }
         }
@@ -123,7 +124,7 @@ namespace ImpLite.NarrowPhase
                 BodyA.ApplyImpulseToCenter(-impulse);
                 BodyB.ApplyImpulseToCenter(impulse);
 
-                var frictionImpulse = ComputeFrictionImpulse(impulse.Length);
+                var frictionImpulse = ComputeFrictionImpulse(impulse.Length());
                 
                 BodyA.ApplyImpulseToCenter(-frictionImpulse);
                 BodyB.ApplyImpulseToCenter(frictionImpulse);

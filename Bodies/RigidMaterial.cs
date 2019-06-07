@@ -1,4 +1,4 @@
-namespace ImpLite.Bodies
+namespace Imp.Bodies
 {
     /// <summary>
     /// Represents properties of some rigid material 

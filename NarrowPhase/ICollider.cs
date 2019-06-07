@@ -1,7 +1,7 @@
 using System;
-using ImpLite.Bodies;
+using Imp.Bodies;
 
-namespace ImpLite.NarrowPhase
+namespace Imp.NarrowPhase
 {
     public interface ICollider : IEquatable<ICollider>
     {

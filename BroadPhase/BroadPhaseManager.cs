@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ImpLite.BroadPhase
+namespace Imp.BroadPhase
 {
     /// <summary>
     /// Represents fast-checker to find objects that can collide during current step.

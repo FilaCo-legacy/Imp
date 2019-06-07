@@ -1,4 +1,4 @@
-namespace ImpLite.Bodies
+namespace Imp.Bodies
 {
     public partial class RigidBody
     {
